@@ -1,0 +1,1 @@
+# che-workspace-telemetry-client
