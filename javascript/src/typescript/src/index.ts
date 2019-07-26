@@ -15,7 +15,7 @@ export * from './openapi/configuration';
 export * from './openapi/api';
 
 type AxiosPromiseWrapper<T> = {
-    [K in keyof T]: T[K] extends (...args: infer Args) => AxiosPromise<infer R> ? (...args: Args) => R : T[K];
+    [K in keyof T]: T[K] extends (...args: infer Args) => AxiosPromise<infer R> ? (...args: Args) => Promise<R> : T[K];
 };
 
 export interface TelemetryApi extends AxiosPromiseWrapper<DefaultApiInterface> {}
@@ -38,11 +38,11 @@ export class TelemetryClient implements TelemetryApi {
                 });
         });
     }
-    
+
     activity(activity: Activity, options?: any): Promise<{}> {
         return this.wrapInPromise(this.delegate.activity, activity);
     }
-    
+
     event(event: Event, options?: any): Promise<{}> {
         return this.wrapInPromise(this.delegate.event, event);
     }
