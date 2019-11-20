@@ -1,0 +1,12 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - GenerateOpenApiSchema",
+      "request": "launch",
+      "mainClass": "org.eclipse.che.incubator.workspace.telemetry.generate.GenerateOpenApiSchema",
+      "projectName": "backend-base",
+      "args": "/home/dfestal/git/che-workspace-telemetry-client/backend-base/target/openapi.yaml"
+    }
+  ]
+}

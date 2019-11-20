@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) 2016-2018 Red Hat, Inc.
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Red Hat, Inc. - initial API and implementation
+ */
+package org.eclipse.che.incubator.workspace.telemetry.base;
+
+import static java.lang.Long.parseLong;
+
+import com.google.common.annotations.VisibleForTesting;
+
+import org.eclipse.che.api.core.model.workspace.Workspace;
+import org.eclipse.che.api.core.model.workspace.WorkspaceConfig;
+import org.eclipse.che.api.core.model.workspace.devfile.Devfile;
+import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
+import org.eclipse.che.api.factory.shared.dto.FactoryDto;
+import org.eclipse.che.api.workspace.shared.Constants;
+import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
+import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.util.Map;
+
+public abstract class AbstractAnalyticsManager {
+  private static final Logger LOG = getLogger(AbstractAnalyticsManager.class);
+
+  protected final String workspaceId;
+
+  @VisibleForTesting final protected String workspaceName;
+  @VisibleForTesting final protected String factoryId;
+  @VisibleForTesting final protected String stackId;
+  @VisibleForTesting final protected String factoryName;
+  @VisibleForTesting final protected String factoryOwner;
+  @VisibleForTesting final protected String factoryUrl;
+  @VisibleForTesting final protected String createdOn;
+  @VisibleForTesting final protected String updatedOn;
+  @VisibleForTesting final protected String stoppedOn;
+  @VisibleForTesting final protected String stoppedAbnormally;
+  @VisibleForTesting final protected String lastErrorMessage;
+  @VisibleForTesting final protected String osioSpaceId;
+  @VisibleForTesting final protected String sourceTypes;
+  @VisibleForTesting final protected String startNumber;
+
+  @VisibleForTesting final protected Long age;
+  @VisibleForTesting final protected Long returnDelay;
+  @VisibleForTesting final protected Boolean firstStart;
+
+  public AbstractAnalyticsManager(
+    String apiEndpoint,
+    String workspaceId,
+    HttpJsonRequestFactory requestFactory) {
+    this.workspaceId = workspaceId;
+
+    try {
+      String endpoint = apiEndpoint + "/workspace/" + workspaceId;
+
+      Workspace workspace = requestFactory.fromUrl(endpoint).request().asDto(WorkspaceDto.class);
+
+      createdOn = workspace.getAttributes().get(Constants.CREATED_ATTRIBUTE_NAME);
+      updatedOn = workspace.getAttributes().get(Constants.UPDATED_ATTRIBUTE_NAME);
+      stoppedOn = workspace.getAttributes().get(Constants.STOPPED_ATTRIBUTE_NAME);
+      stoppedAbnormally =
+          workspace.getAttributes().get(Constants.STOPPED_ABNORMALLY_ATTRIBUTE_NAME);
+      lastErrorMessage = workspace.getAttributes().get(Constants.ERROR_MESSAGE_ATTRIBUTE_NAME);
+      sourceTypes = workspace.getAttributes().get("sourceTypes");
+      startNumber = workspace.getAttributes().get("startNumber");
+
+      Long createDate = null;
+      Long updateDate = null;
+      Long stopDate = null;
+      try {
+        createDate = parseLong(createdOn);
+      } catch (NumberFormatException nfe) {
+        LOG.warn("the create timestamp ( " + createdOn + " ) has invalid format", nfe);
+      }
+      try {
+        updateDate = parseLong(updatedOn);
+      } catch (NumberFormatException nfe) {
+        LOG.warn("the update timestamp ( " + updatedOn + " ) has invalid format", nfe);
+      }
+      if (stoppedOn != null) {
+        try {
+          stopDate = parseLong(stoppedOn);
+        } catch (NumberFormatException nfe) {
+          LOG.warn("the stop timestamp ( " + stoppedOn + " ) has invalid format", nfe);
+        }
+      }
+
+      if (updateDate != null && createDate != null) {
+        age = (updateDate - createDate) / 1000;
+      } else {
+        age = null;
+      }
+      if (updateDate != null && stopDate != null) {
+        returnDelay = (updateDate - stopDate) / 1000;
+      } else {
+        returnDelay = null;
+      }
+      if (updateDate != null) {
+        firstStart = stopDate == null;
+      } else {
+        firstStart = null;
+      }
+
+      WorkspaceConfig workspaceConfig = workspace.getConfig();
+      Devfile devfile = workspace.getDevfile();
+
+      stackId = workspace.getAttributes().get("stackName");
+      factoryId = workspace.getAttributes().get("factoryId");
+      if (factoryId != null && !"undefined".equals(factoryId)) {
+        endpoint = apiEndpoint + "/factory/" + factoryId;
+
+        FactoryDto factory = null;
+        try {
+          factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
+        } catch (Exception e) {
+          LOG.warn(
+              "Can't get workspace factory ('" + factoryId + "') informations for Che analytics",
+              e);
+        }
+        if (factory != null) {
+          factoryName = factory.getName();
+          factoryOwner = factory.getCreator().getName();
+        } else {
+          factoryName = null;
+          factoryOwner = null;
+        }
+        factoryUrl = null;
+      } else {
+        String parametersPrefix = "factory.parameter.";
+        if (workspaceConfig != null) {
+          Map<String, String> configAttributes = workspaceConfig.getAttributes();
+          if (configAttributes.containsKey(parametersPrefix + "name")) {
+            factoryName = configAttributes.get(parametersPrefix + "name");
+          } else {
+            factoryName = null;
+          }
+          if (configAttributes.containsKey(parametersPrefix + "user")) {
+            factoryOwner = configAttributes.get(parametersPrefix + "user");
+          } else {
+            factoryOwner = null;
+          }
+          if (configAttributes.containsKey(parametersPrefix + "url")) {
+            factoryUrl = configAttributes.get(parametersPrefix + "url");
+          } else {
+            factoryUrl = null;
+          }
+        } else {
+          factoryName = null;
+          factoryOwner = null;
+          factoryUrl = null;
+        }
+      }
+      osioSpaceId = workspace.getAttributes().get("osio_spaceId");
+
+      if (workspaceConfig != null) {
+        workspaceName = workspaceConfig.getName();
+      } else if (devfile != null) {
+        workspaceName = devfile.getMetadata().getName();
+      } else {
+        workspaceName = null;
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Can't get workspace informations for Che analytics", e);
+    }
+  }
+
+  public final String getWorkspaceId() {
+    return workspaceId;
+  }
+
+  public abstract boolean isEnabled();
+
+  public abstract void onActivity(String userId);
+
+  public abstract void onEvent(
+      String userId,
+      AnalyticsEvent event,
+      Map<String, Object> properties,
+      String ip,
+      String userAgent);
+
+  public abstract void destroy();
+}

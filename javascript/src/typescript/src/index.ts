@@ -28,7 +28,7 @@ export class TelemetryClient implements TelemetryApi {
     }
 
     private wrapInPromise<T, Args extends any[]>(f: (...args: Args) => AxiosPromise<T>, ...args: Args) {
-        return new Promise((resolve, reject) => {
+        return new Promise<T>((resolve, reject) => {
             f(...args)
                 .then((response: AxiosResponse<{}>) => {
                     resolve();
@@ -39,11 +39,11 @@ export class TelemetryClient implements TelemetryApi {
         });
     }
 
-    activity(activity: Activity, options?: any): Promise<{}> {
+    activity(activity: Activity, options?: any): Promise<string> {
         return this.wrapInPromise(this.delegate.activity, activity);
     }
 
-    event(event: Event, options?: any): Promise<{}> {
+    event(event: Event, options?: any): Promise<string> {
         return this.wrapInPromise(this.delegate.event, event);
     }
 }

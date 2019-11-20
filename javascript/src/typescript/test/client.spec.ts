@@ -30,7 +30,7 @@ describe('RestAPI >', () => {
     });
 
     it('activity test - successful', (done) => {
-        backend.stubRequest('POST', '/activity', {
+        backend.stubRequest('POST', '/telemetry/activity', {
             status: 200,
             responseText: ''
         });
@@ -48,7 +48,7 @@ describe('RestAPI >', () => {
     });
 
     it('activity test - Error', (done) => {
-        backend.stubRequest('POST', '/activity', {
+        backend.stubRequest('POST', '/telemetry/activity', {
             status: 500,
             responseText: 'This is an error message !'
         });

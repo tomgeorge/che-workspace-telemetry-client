@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.eclipse.che.incubator.workspace-telemetry-client</groupId>
+        <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
         <artifactId>parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -10,11 +10,10 @@
     <packaging>pom</packaging>
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.che.incubator.workspace-telemetry-client</groupId>
-            <artifactId>api</artifactId>
+            <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
+            <artifactId>backend-base</artifactId>
             <classifier>resources</classifier>
             <type>zip</type>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>

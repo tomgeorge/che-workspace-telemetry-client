@@ -14,9 +14,9 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@eclipse-che/api@^6.16.1":
-  version "6.17.1"
-  resolved "https://registry.yarnpkg.com/@eclipse-che/api/-/api-6.17.1.tgz#bae00a5ac60501566759ff07b134867996ce8964"
+"@eclipse-che/api@^7.3.2":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@eclipse-che/api/-/api-7.4.0.tgz#74be0ca037ea2e9702d74971ac2ed8befdcb8a46"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
