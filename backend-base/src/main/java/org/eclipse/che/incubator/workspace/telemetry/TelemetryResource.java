@@ -22,6 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 import io.quarkus.runtime.ShutdownEvent;
+import io.quarkus.runtime.StartupEvent;
 
 @Path("/")
 @ApplicationScoped
@@ -43,15 +44,15 @@ public class TelemetryResource {
             description = "Event to send",
             required = true)
         Event event) {
-            Map<String, Object> params = 
+            Map<String, Object> params =
                 event.getProperties().stream()
                 .collect(Collectors.toMap(e->e.getId(), e->e.getValue()));
-  
+
                 analyticsManager.onActivity(event.getUserId());
                 analyticsManager.onEvent(event.getUserId(),  AnalyticsEvent.valueOf(event.getId()), params, event.getIp(), event.getAgent());
                 return "";
       }
-    
+
     @POST
     @Path("/activity")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -69,6 +70,12 @@ public class TelemetryResource {
     ) {
         analyticsManager.onActivity(activity.getUserId());
         return "";
+    }
+
+    void onStart(@Observes StartupEvent ev) {
+        // Just to trigger the injection of the
+        // analytics manager at start, so that initialization
+        // errors can be thrown at start.
     }
 
     void onStop(@Observes ShutdownEvent ev) {
