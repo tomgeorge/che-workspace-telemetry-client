@@ -1,6 +1,6 @@
 {
   "name": "@dfatwork-pkgs/workspace-telemetry-client",
-  "version": "0.0.1-1574258186",
+  "version": "0.0.1-1574869317",
   "description": "",
   "main": "dist/server.js",
   "browser": "dist/client.js",

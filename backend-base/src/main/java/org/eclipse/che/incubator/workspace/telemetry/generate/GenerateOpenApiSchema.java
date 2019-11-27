@@ -9,12 +9,14 @@ import org.jboss.jandex.Index;
 import org.jboss.jandex.IndexReader;
 
 import io.smallrye.openapi.api.OpenApiConfigImpl;
+import io.smallrye.openapi.api.OpenApiConstants;
 import io.smallrye.openapi.runtime.io.OpenApiSerializer;
 import io.smallrye.openapi.runtime.io.OpenApiSerializer.Format;
 import io.smallrye.openapi.runtime.scanner.OpenApiAnnotationScanner;
 
 public class GenerateOpenApiSchema {
   public static void main(String[] args) throws IOException {
+    System.setProperty(OpenApiConstants.SCHEMA_REFERENCES_ENABLE, "true");
     IndexReader indexReader = new IndexReader(GenerateOpenApiSchema.class.getClassLoader().getResourceAsStream("META-INF/jandex.idx"));
     Index index = indexReader.read();
     OpenAPI openAPI = new OpenApiAnnotationScanner(new OpenApiConfigImpl(ConfigProvider.getConfig()), index).scan();

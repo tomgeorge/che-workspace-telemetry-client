@@ -14,6 +14,7 @@ package org.eclipse.che.incubator.workspace.telemetry.model;
 
 import java.util.Objects;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.util.ArrayList;
@@ -30,10 +31,28 @@ public class Event {
   public String ownerId;
   public String ip;
   public String agent;
-  public List<EventProperties> properties = new ArrayList<EventProperties>();
+  public String resolution;
+  public List<EventProperty> properties = new ArrayList<EventProperty>();
   
   public Event() {
   }
+
+  public Event(
+    String id,
+    String userId,
+    String ownerId,
+    String ip,
+    String agent,
+    String resolution,
+    List<EventProperty> properties) {
+      this.id = id;
+      this.userId = userId;
+      this.ownerId = ownerId;
+      this.ip = ip;
+      this.agent = agent;
+      this.resolution = resolution;
+      this.properties = properties;
+    }
 
   @Schema(
     description = "Identifier of the event type",
@@ -95,13 +114,25 @@ public class Event {
   }
 
   @Schema(
+    description = "Resolution of the screen of the browser that issued the event",
+    required = true,
+    example = "1024x768"
+  )
+  public String getResolution() {
+    return resolution;
+  }
+  public void setResolution(String resolution) {
+    this.resolution = resolution;
+  }
+
+  @Schema(
     description = "Properties of the event",
     required = true
   )
-  public List<EventProperties> getProperties() {
+  public List<EventProperty> getProperties() {
     return properties;
   }
-  public void setProperties(List<EventProperties> properties) {
+  public void setProperties(List<EventProperty> properties) {
     this.properties = properties;
   }
 

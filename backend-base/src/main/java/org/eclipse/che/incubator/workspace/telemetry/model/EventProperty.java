@@ -8,19 +8,29 @@ package org.eclipse.che.incubator.workspace.telemetry.model;
 
 import java.util.Objects;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 /**
  * EventProperties
  */
 
-public class EventProperties {
+public class EventProperty {
 
   public String id;
   public String value;
 
-  /**
-  * Get id
-  * @return id
-  **/
+  public EventProperty() {
+  }
+
+  public EventProperty(String id, String value) {
+    this.id = id;
+    this.value = value;
+  }
+
+  @Schema(
+    description = "Id of the event property",
+    required = true
+  )
   public String getId() {
     return id;
   }
@@ -28,10 +38,10 @@ public class EventProperties {
     this.id = id;
   }
 
-  /**
-  * Get value
-  * @return value
-  **/
+  @Schema(
+    description = "Value of the event property",
+    required = true
+  )
   public String getValue() {
     return value;
   }
@@ -47,9 +57,9 @@ public class EventProperties {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    EventProperties eventProperties = (EventProperties) o;
-    return Objects.equals(this.id, eventProperties.id) &&
-        Objects.equals(this.value, eventProperties.value);
+    EventProperty eventProperty = (EventProperty) o;
+    return Objects.equals(this.id, eventProperty.id) &&
+        Objects.equals(this.value, eventProperty.value);
   }
 
   @Override
@@ -60,7 +70,7 @@ public class EventProperties {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class EventProperties {\n");
+    sb.append("class EventProperty {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
