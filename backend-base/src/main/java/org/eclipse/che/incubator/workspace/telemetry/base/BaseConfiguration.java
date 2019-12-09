@@ -1,6 +1,7 @@
 package org.eclipse.che.incubator.workspace.telemetry.base;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 
 import org.eclipse.che.api.core.rest.DefaultHttpJsonRequestFactory;
@@ -12,6 +13,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.arc.DefaultBean;
 
 @Dependent
+@Default
 public class BaseConfiguration {
     @ConfigProperty(name = "che.api") 
     protected String apiEndpoint;
@@ -19,7 +21,7 @@ public class BaseConfiguration {
     @ConfigProperty(name = "che.workspace.id")
     protected String workspaceId;
 
-    protected HttpJsonRequestFactory requestFactory() {
+    private HttpJsonRequestFactory requestFactory() {
         return new DefaultHttpJsonRequestFactory() {
 
             private final String machineToken = System.getenv("CHE_MACHINE_TOKEN");
