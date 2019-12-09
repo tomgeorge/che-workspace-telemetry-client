@@ -27,6 +27,7 @@ import io.quarkus.runtime.StartupEvent;
 @Path("/")
 @ApplicationScoped
 public class TelemetryResource {
+    
     @Inject
     AbstractAnalyticsManager analyticsManager;
 

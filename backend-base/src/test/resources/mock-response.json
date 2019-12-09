@@ -1,0 +1,293 @@
+{
+  "links": {
+    "self": "http://che-che.apps-crc.testing/api/workspace/workspacecohb7042orvo0odb",
+    "ide": "http://che-che.apps-crc.testing/admin/wksp-lqq9",
+    "environment/statusChannel": "ws://che-che.apps-crc.testing/api/websocket",
+    "environment/outputChannel": "ws://che-che.apps-crc.testing/api/websocket"
+  },
+  "attributes": {
+    "stackName": "Go",
+    "org.eclipse.che.runtimes_id": "runtimesfaceygzr1jkgv7m1",
+    "infrastructureNamespace": "che",
+    "updated": "1575575662792",
+    "created": "1575567196811"
+  },
+  "namespace": "admin",
+  "temporary": false,
+  "id": "workspacecohb7042orvo0odb",
+  "status": "RUNNING",
+  "runtime": {
+    "machines": {
+      "theia-ide39u": {
+        "attributes": {
+          "memoryLimitBytes": "512000000",
+          "memoryRequestBytes": "512000000",
+          "source": "tool",
+          "plugin": "eclipse/che-theia/7.4.0"
+        },
+        "servers": {
+          "theia-dev": {
+            "url": "http://route2addvvrd-che.apps-crc.testing",
+            "attributes": {
+              "internal": "false",
+              "type": "ide-dev",
+              "port": "3130",
+              "discoverable": "false"
+            },
+            "status": "UNKNOWN"
+          },
+          "theia": {
+            "url": "http://routemcrcqyy5-che.apps-crc.testing",
+            "attributes": {
+              "internal": "false",
+              "port": "3100",
+              "discoverable": "false",
+              "cookiesAuthEnabled": "true",
+              "type": "ide",
+              "secure": "true"
+            },
+            "status": "RUNNING"
+          },
+          "theia-redirect-3": {
+            "url": "http://routeercbc35m-che.apps-crc.testing",
+            "attributes": {
+              "internal": "false",
+              "port": "13133",
+              "discoverable": "false"
+            },
+            "status": "UNKNOWN"
+          },
+          "theia-redirect-2": {
+            "url": "http://routew8dxn16d-che.apps-crc.testing",
+            "attributes": {
+              "internal": "false",
+              "port": "13132",
+              "discoverable": "false"
+            },
+            "status": "UNKNOWN"
+          },
+          "theia-redirect-1": {
+            "url": "http://route432ee7a3-che.apps-crc.testing",
+            "attributes": {
+              "internal": "false",
+              "port": "13131",
+              "discoverable": "false"
+            },
+            "status": "UNKNOWN"
+          }
+        },
+        "status": "RUNNING"
+      },
+      "che-jwtproxy": {
+        "attributes": {
+          "memoryLimitBytes": "134217728",
+          "memoryRequestBytes": "134217728",
+          "source": "tool"
+        },
+        "status": "RUNNING"
+      },
+      "vscode-goyxf": {
+        "attributes": {
+          "memoryLimitBytes": "536870912",
+          "memoryRequestBytes": "536870912",
+          "component": "go-plugin",
+          "source": "tool",
+          "plugin": "ms-vscode/go/latest"
+        },
+        "status": "RUNNING"
+      },
+      "che-machine-execo44": {
+        "attributes": {
+          "memoryLimitBytes": "134217728",
+          "memoryRequestBytes": "134217728",
+          "source": "tool",
+          "plugin": "eclipse/che-machine-exec-plugin/7.4.0"
+        },
+        "servers": {
+          "che-machine-exec": {
+            "url": "ws://route3c2wzhgy-che.apps-crc.testing",
+            "attributes": {
+              "internal": "false",
+              "port": "4444",
+              "discoverable": "false",
+              "cookiesAuthEnabled": "true",
+              "type": "terminal",
+              "secure": "true"
+            },
+            "status": "UNKNOWN"
+          }
+        },
+        "status": "RUNNING"
+      },
+      "go-cli": {
+        "attributes": {
+          "memoryLimitBytes": "536870912",
+          "memoryRequestBytes": "536870912",
+          "component": "go-cli",
+          "source": "recipe"
+        },
+        "servers": {
+          "8080/tcp": {
+            "url": "http://route39j4u41i-che.apps-crc.testing",
+            "attributes": {
+              "port": "8080"
+            },
+            "status": "UNKNOWN"
+          }
+        },
+        "status": "RUNNING"
+      }
+    },
+    "activeEnv": "default",
+    "commands": [
+      {
+        "commandLine": "go get -d && go run main.go",
+        "name": "run outyet",
+        "attributes": {
+          "componentAlias": "go-cli",
+          "machineName": "go-cli",
+          "workingDir": "${CHE_PROJECTS_ROOT}/src/github.com/golang/example/outyet"
+        },
+        "type": "exec"
+      },
+      {
+        "commandLine": "kill $(pidof go)",
+        "name": "stop outyet",
+        "attributes": {
+          "componentAlias": "go-cli",
+          "machineName": "go-cli"
+        },
+        "type": "exec"
+      },
+      {
+        "name": "Debug current file",
+        "attributes": {
+          "actionReferenceContent": "{\n  \"version\": \"0.2.0\",\n  \"configurations\": [\n    {\n      \"name\": \"Debug current file\",\n      \"type\": \"go\",\n      \"request\": \"launch\",\n      \"mode\": \"auto\",\n      \"program\": \"${fileDirname}\",\n    },\n  ]\n}\n"
+        },
+        "type": "vscode-launch"
+      },
+      {
+        "commandLine": "go get -d && go run ${file}",
+        "name": "run current file",
+        "attributes": {
+          "componentAlias": "go-cli",
+          "machineName": "go-cli",
+          "workingDir": "${fileDirname}"
+        },
+        "type": "exec"
+      },
+      {
+        "commandLine": "go test",
+        "name": "test outyet",
+        "attributes": {
+          "componentAlias": "go-cli",
+          "machineName": "go-cli",
+          "workingDir": "${CHE_PROJECTS_ROOT}/src/github.com/golang/example/outyet"
+        },
+        "type": "exec"
+      }
+    ],
+    "machineToken": "eyJhbGciOiJSUzI1NiIsImtpbmQiOiJtYWNoaW5lX3Rva2VuIiwia2lkIjoid29ya3NwYWNlY29oYjcwNDJvcnZvMG9kYiJ9.eyJ3c2lkIjoid29ya3NwYWNlY29oYjcwNDJvcnZvMG9kYiIsInVpZCI6IjhhNGU2NmM5LTliYmUtNDhkNS05OGUzLWU1Y2JlY2MwMDBiMyIsImF1ZCI6IndvcmtzcGFjZWNvaGI3MDQyb3J2bzBvZGIiLCJuYmYiOi0xLCJ1bmFtZSI6ImFkbWluIiwiaXNzIjoid3NtYXN0ZXIiLCJleHAiOjE2MDcxMTE2MTIsImlhdCI6MTU3NTU3NTYxMiwianRpIjoiNDZmNThjNmQtM2ViYy00YWExLTlkZDYtMzczOTNlYWVhM2EzIn0.F4pDa3w4MvI8GT1HyeOYZqkBplSG5DJKifq8H1ZWSsIg0OhMsRY9z74UG_mlg0b6C7LJCBvIsIDsG-9e6pWPBoMPsDoGzmbD4ORt_hHOqB--AfEzpq3qknnXQl6VLeJME7gHY-TxtQ9S6I1aQ4HOSZT8c1881u8Uiukd3F0Yfpr1cK_FJN-8_KyxovESdTbGfTSLwEM9l-3IuM91vCpnHJ5DpdNTP01dkzGJwjB2NmchdVqT8XB_loCeNMZ2xzJJ9qLzrT29bVQ5gTjJOqSe0fKy_v3dbJ9CoqEeyvI3tKFKwzykjTLb9G1FnRJZ3qOWnaFG2vr245yYFpadOhS9XA"
+  },
+  "devfile": {
+    "metadata": {
+      "name": "wksp-lqq9"
+    },
+    "projects": [
+      {
+        "name": "example",
+        "source": {
+          "location": "https://github.com/golang/example.git",
+          "type": "git"
+        },
+        "clonePath": "src/github.com/golang/example/"
+      }
+    ],
+    "components": [
+      {
+        "id": "ms-vscode/go/latest",
+        "memoryLimit": "512Mi",
+        "type": "chePlugin",
+        "alias": "go-plugin"
+      },
+      {
+        "mountSources": true,
+        "endpoints": [
+          {
+            "name": "8080/tcp",
+            "port": 8080
+          }
+        ],
+        "memoryLimit": "512Mi",
+        "type": "dockerimage",
+        "alias": "go-cli",
+        "image": "quay.io/eclipse/che-golang-1.12:7.4.0",
+        "env": [
+          {
+            "value": "/go:$(CHE_PROJECTS_ROOT)",
+            "name": "GOPATH"
+          },
+          {
+            "value": "/tmp/.cache",
+            "name": "GOCACHE"
+          }
+        ]
+      }
+    ],
+    "apiVersion": "1.0.0",
+    "commands": [
+      {
+        "name": "run outyet",
+        "actions": [
+          {
+            "workdir": "${CHE_PROJECTS_ROOT}/src/github.com/golang/example/outyet",
+            "type": "exec",
+            "command": "go get -d && go run main.go",
+            "component": "go-cli"
+          }
+        ]
+      },
+      {
+        "name": "stop outyet",
+        "actions": [
+          {
+            "type": "exec",
+            "command": "kill $(pidof go)",
+            "component": "go-cli"
+          }
+        ]
+      },
+      {
+        "name": "test outyet",
+        "actions": [
+          {
+            "workdir": "${CHE_PROJECTS_ROOT}/src/github.com/golang/example/outyet",
+            "type": "exec",
+            "command": "go test",
+            "component": "go-cli"
+          }
+        ]
+      },
+      {
+        "name": "run current file",
+        "actions": [
+          {
+            "workdir": "${fileDirname}",
+            "type": "exec",
+            "command": "go get -d && go run ${file}",
+            "component": "go-cli"
+          }
+        ]
+      },
+      {
+        "name": "Debug current file",
+        "actions": [
+          {
+            "referenceContent": "{\n  \"version\": \"0.2.0\",\n  \"configurations\": [\n    {\n      \"name\": \"Debug current file\",\n      \"type\": \"go\",\n      \"request\": \"launch\",\n      \"mode\": \"auto\",\n      \"program\": \"${fileDirname}\",\n    },\n  ]\n}\n",
+            "type": "vscode-launch"
+          }
+        ]
+      }
+    ]
+  }
+}

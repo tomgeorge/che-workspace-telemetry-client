@@ -121,7 +121,7 @@ public abstract class AbstractAnalyticsManager {
           factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
         } catch (Exception e) {
           LOG.warn(
-              "Can't get workspace factory ('" + factoryId + "') informations for Che analytics",
+              "Can't get workspace factory ('" + factoryId + "') information for Che analytics",
               e);
         }
         if (factory != null) {
