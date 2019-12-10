@@ -28,11 +28,9 @@ For a native Quarkus image:
 
 ##### Standard Integration Test (Not native-mode)
 
-The maven build does not automatically run the integration tests for some reason, but you can manually run them:
-
 ```shell script
 export CHE_MACHINE_TOKEN=<token from workspace>
-mvn test -Dtest=TelemetryResourceIT test -Dche.api<the URL of the che api> -Dche.workspace.id=<che workspace id>
+mvn [integration-test | verify] -Dche.api<the URL of the che api> -Dche.workspace.id=<che workspace id>
 ```
 
 ##### Native-mode testing
@@ -40,5 +38,5 @@ mvn test -Dtest=TelemetryResourceIT test -Dche.api<the URL of the che api> -Dche
 Compile the native binary with your che.api and che.workspace.id values either in application.properties or on the command line, as above
 
 ```shell script
-mvn -Dtest=NativeTelemetryResourceIT test -Dche.api=<URL of Che API> -Dche.workspace.id=<che workspace ID> -Dnative.image.path=target/backend-base-0.0.1-SNAPSHOT-runner
+mvn [integration-test | verify] -Dche.api=<URL of Che API> -Dche.workspace.id=<che workspace ID> -Dnative.image.path=target/backend-base-0.0.1-SNAPSHOT-runner
 ```
