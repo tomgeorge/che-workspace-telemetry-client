@@ -41,8 +41,7 @@ public class RuntimeReflectionRegistrationFeature implements Feature {
     } else if (type instanceof GenericArrayType) {
       GenericArrayType genericArrayType = (GenericArrayType) type;
       registerFully(genericArrayType.getGenericComponentType());
-    }
-    else if (type instanceof Class<?>) {
+    } else if (type instanceof Class<?>) {
       registerFully((Class<?>) type);
     }
   }

@@ -15,36 +15,36 @@ import io.quarkus.arc.DefaultBean;
 @Dependent
 @Default
 public class BaseConfiguration {
-    @ConfigProperty(name = "che.api") 
-    protected String apiEndpoint;
-    
-    @ConfigProperty(name = "che.workspace.id")
-    protected String workspaceId;
+  @ConfigProperty(name = "che.api")
+  protected String apiEndpoint;
 
-    private HttpJsonRequestFactory requestFactory() {
-        return new DefaultHttpJsonRequestFactory() {
+  @ConfigProperty(name = "che.workspace.id")
+  protected String workspaceId;
 
-            private final String machineToken = System.getenv("CHE_MACHINE_TOKEN");
+  private HttpJsonRequestFactory requestFactory() {
+    return new DefaultHttpJsonRequestFactory() {
 
-            @Override
-            public HttpJsonRequest fromUrl(String url) {
-              return super.fromUrl(url).setAuthorizationHeader(getMachineToken());
-            }
-          
-            @Override
-            public HttpJsonRequest fromLink(Link link) {
-              return super.fromLink(link).setAuthorizationHeader(getMachineToken());
-            }
-          
-            private String getMachineToken() {
-              return machineToken;
-            }
-        };
-    }
+      private final String machineToken = System.getenv("CHE_MACHINE_TOKEN");
 
-    @Produces
-    @DefaultBean
-    protected AbstractAnalyticsManager analyticsManager() {
-      return new DefaultAnalyticsManager(apiEndpoint, workspaceId, requestFactory());
-    }
+      @Override
+      public HttpJsonRequest fromUrl(String url) {
+        return super.fromUrl(url).setAuthorizationHeader(getMachineToken());
+      }
+
+      @Override
+      public HttpJsonRequest fromLink(Link link) {
+        return super.fromLink(link).setAuthorizationHeader(getMachineToken());
+      }
+
+      private String getMachineToken() {
+        return machineToken;
+      }
+    };
+  }
+
+  @Produces
+  @DefaultBean
+  protected AbstractAnalyticsManager analyticsManager() {
+    return new DefaultAnalyticsManager(apiEndpoint, workspaceId, requestFactory());
+  }
 }

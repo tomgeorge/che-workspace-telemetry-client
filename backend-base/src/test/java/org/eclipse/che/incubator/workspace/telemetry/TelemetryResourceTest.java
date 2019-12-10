@@ -17,33 +17,33 @@ import static org.junit.jupiter.api.Assertions.*;
 @QuarkusTest
 public class TelemetryResourceTest {
 
-    @Inject
-    TelemetryResource telemetryResource;
+  @Inject
+  TelemetryResource telemetryResource;
 
-    @BeforeAll
-    public static void setUp() {
-        System.setProperty("che.api", "http://fake-che.com/api");
-        System.setProperty("che.workspace.id", "fake-workspace");
-    }
+  @BeforeAll
+  public static void setUp() {
+    System.setProperty("che.api", "http://fake-che.com/api");
+    System.setProperty("che.workspace.id", "fake-workspace");
+  }
 
-    @AfterAll
-    public static void tesrDown() {
-        System.clearProperty("che.api");
-        System.clearProperty("che.workspace.id");
-    }
+  @AfterAll
+  public static void tesrDown() {
+    System.clearProperty("che.api");
+    System.clearProperty("che.workspace.id");
+  }
 
-    @Test
-    public void testActivity() {
-        Activity activity = new Activity("user1");
-        String response = telemetryResource.activity(activity);
-        assertEquals("", response);
-    }
+  @Test
+  public void testActivity() {
+    Activity activity = new Activity("user1");
+    String response = telemetryResource.activity(activity);
+    assertEquals("", response);
+  }
 
-    @Test
-    public void testEvent() {
-        ArrayList<EventProperty> properties = new ArrayList<EventProperty>();
-        Event e = new Event("WORKSPACE_STARTED", "user1", "1", "127.0.0.1", "curl", "", properties);
-        String response = telemetryResource.event(e);
-        assertEquals("", response);
-    }
+  @Test
+  public void testEvent() {
+    ArrayList<EventProperty> properties = new ArrayList<EventProperty>();
+    Event e = new Event("WORKSPACE_STARTED", "user1", "1", "127.0.0.1", "curl", "", properties);
+    String response = telemetryResource.event(e);
+    assertEquals("", response);
+  }
 }

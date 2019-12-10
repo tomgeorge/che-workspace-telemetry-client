@@ -27,59 +27,59 @@ import io.quarkus.runtime.StartupEvent;
 @Path("/")
 @ApplicationScoped
 public class TelemetryResource {
-    
-    @Inject
-    AbstractAnalyticsManager analyticsManager;
 
-    @POST
-    @Path("/event")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    @Operation(summary = "Posts a telemetry event",
-    description = "Submit telemetry events to the workspace telemetry manager.\nThe event Id should be the Id of a built-in event or of an alread-registered custom event",
-    operationId = "event")
-    @APIResponse(responseCode = "200", description = "Event was successfully submitted")
-    @APIResponse(responseCode = "400", description = "Error during event submission")
-    public String event(
-        @RequestBody(
-            description = "Event to send",
-            required = true)
-        Event event) {
-            Map<String, Object> params =
-                event.getProperties().stream()
-                .collect(Collectors.toMap(e->e.getId(), e->e.getValue()));
+  @Inject
+  AbstractAnalyticsManager analyticsManager;
 
-                analyticsManager.onActivity(event.getUserId());
-                analyticsManager.onEvent(event.getUserId(),  AnalyticsEvent.valueOf(event.getId()), params, event.getIp(), event.getAgent());
-                return "";
-      }
+  @POST
+  @Path("/event")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.TEXT_PLAIN)
+  @Operation(summary = "Posts a telemetry event",
+      description = "Submit telemetry events to the workspace telemetry manager.\nThe event Id should be the Id of a built-in event or of an alread-registered custom event",
+      operationId = "event")
+  @APIResponse(responseCode = "200", description = "Event was successfully submitted")
+  @APIResponse(responseCode = "400", description = "Error during event submission")
+  public String event(
+      @RequestBody(
+          description = "Event to send",
+          required = true)
+          Event event) {
+    Map<String, Object> params =
+        event.getProperties().stream()
+            .collect(Collectors.toMap(e -> e.getId(), e -> e.getValue()));
 
-    @POST
-    @Path("/activity")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    @Operation(summary = "Notifies that some activity is still occuring from a given user",
-    description = "Notifies that some activity is still occuring for a given user. This will allow maintaining the current session alive for telemetry backends that manage user sessions.",
-    operationId = "activity")
-    @APIResponse(responseCode = "200", description = "Notification was successfully submitted")
-    public String activity(
-        @RequestBody(
-            description = "Activity to notify",
-            required = true
-        )
-        Activity activity
-    ) {
-        analyticsManager.onActivity(activity.getUserId());
-        return "";
-    }
+    analyticsManager.onActivity(event.getUserId());
+    analyticsManager.onEvent(event.getUserId(), AnalyticsEvent.valueOf(event.getId()), params, event.getIp(), event.getAgent());
+    return "";
+  }
 
-    void onStart(@Observes StartupEvent ev) {
-        // Just to trigger the injection of the
-        // analytics manager at start, so that initialization
-        // errors can be thrown at start.
-    }
+  @POST
+  @Path("/activity")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.TEXT_PLAIN)
+  @Operation(summary = "Notifies that some activity is still occuring from a given user",
+      description = "Notifies that some activity is still occuring for a given user. This will allow maintaining the current session alive for telemetry backends that manage user sessions.",
+      operationId = "activity")
+  @APIResponse(responseCode = "200", description = "Notification was successfully submitted")
+  public String activity(
+      @RequestBody(
+          description = "Activity to notify",
+          required = true
+      )
+          Activity activity
+  ) {
+    analyticsManager.onActivity(activity.getUserId());
+    return "";
+  }
 
-    void onStop(@Observes ShutdownEvent ev) {
-        analyticsManager.destroy();
-    }
+  void onStart(@Observes StartupEvent ev) {
+    // Just to trigger the injection of the
+    // analytics manager at start, so that initialization
+    // errors can be thrown at start.
+  }
+
+  void onStop(@Observes ShutdownEvent ev) {
+    analyticsManager.destroy();
+  }
 }

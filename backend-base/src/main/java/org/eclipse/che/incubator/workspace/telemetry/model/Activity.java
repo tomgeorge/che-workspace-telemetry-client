@@ -32,12 +32,13 @@ public class Activity {
   }
 
   /**
-  * Identifier of the user that notified activity
-  * @return userId
-  **/
+   * Identifier of the user that notified activity
+   *
+   * @return userId
+   **/
   @Schema(
-    description = "Identifier of the user that notified activity",
-    required = true
+      description = "Identifier of the user that notified activity",
+      required = true
   )
   public String getUserId() {
     return userId;
@@ -46,7 +47,7 @@ public class Activity {
   public void setUserId(String userId) {
     this.userId = userId;
   }
-  
+
   @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
@@ -68,7 +69,7 @@ public class Activity {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Activity {\n");
-    
+
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("}");
     return sb.toString();

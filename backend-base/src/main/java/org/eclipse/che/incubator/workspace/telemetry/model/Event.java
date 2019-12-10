@@ -33,105 +33,112 @@ public class Event {
   public String agent;
   public String resolution;
   public List<EventProperty> properties = new ArrayList<EventProperty>();
-  
+
   public Event() {
   }
 
   public Event(
-    String id,
-    String userId,
-    String ownerId,
-    String ip,
-    String agent,
-    String resolution,
-    List<EventProperty> properties) {
-      this.id = id;
-      this.userId = userId;
-      this.ownerId = ownerId;
-      this.ip = ip;
-      this.agent = agent;
-      this.resolution = resolution;
-      this.properties = properties;
-    }
+      String id,
+      String userId,
+      String ownerId,
+      String ip,
+      String agent,
+      String resolution,
+      List<EventProperty> properties) {
+    this.id = id;
+    this.userId = userId;
+    this.ownerId = ownerId;
+    this.ip = ip;
+    this.agent = agent;
+    this.resolution = resolution;
+    this.properties = properties;
+  }
 
   @Schema(
-    description = "Identifier of the event type",
-    required = true,
-    example = "WORKSPACE_USED"
+      description = "Identifier of the event type",
+      required = true,
+      example = "WORKSPACE_USED"
   )
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
 
   @Schema(
-    description = "Identifier of the user that issued the event",
-    required = true
+      description = "Identifier of the user that issued the event",
+      required = true
   )
   public String getUserId() {
     return userId;
   }
+
   public void setUserId(String userId) {
     this.userId = userId;
   }
 
   @Schema(
-    description = "Identifier of the component that issued the event",
-    required = true
+      description = "Identifier of the component that issued the event",
+      required = true
   )
   public String getOwnerId() {
     return ownerId;
   }
+
   public void setOwnerId(String ownerId) {
     this.ownerId = ownerId;
   }
 
   @Schema(
-    description = "IP address of the browser that issued the event",
-    required = true,
-    format = "ipv4",
-    example = "127.0.0.1"
+      description = "IP address of the browser that issued the event",
+      required = true,
+      format = "ipv4",
+      example = "127.0.0.1"
   )
   public String getIp() {
     return ip;
   }
+
   public void setIp(String ip) {
     this.ip = ip;
   }
 
   @Schema(
-    description = "User agent of the browser that issued the event",
-    required = true,
-    example = "Mozilla/5.0 (X11; Linux x86_64…) Gecko/20100101 Firefox/60.0"
+      description = "User agent of the browser that issued the event",
+      required = true,
+      example = "Mozilla/5.0 (X11; Linux x86_64…) Gecko/20100101 Firefox/60.0"
   )
   public String getAgent() {
     return agent;
   }
+
   public void setAgent(String agent) {
     this.agent = agent;
   }
 
   @Schema(
-    description = "Resolution of the screen of the browser that issued the event",
-    required = true,
-    example = "1024x768"
+      description = "Resolution of the screen of the browser that issued the event",
+      required = true,
+      example = "1024x768"
   )
   public String getResolution() {
     return resolution;
   }
+
   public void setResolution(String resolution) {
     this.resolution = resolution;
   }
 
   @Schema(
-    description = "Properties of the event",
-    required = true
+      description = "Properties of the event",
+      required = true
   )
   public List<EventProperty> getProperties() {
     return properties;
   }
+
   public void setProperties(List<EventProperty> properties) {
     this.properties = properties;
   }
@@ -162,7 +169,7 @@ public class Event {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Event {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("    ownerId: ").append(toIndentedString(ownerId)).append("\n");

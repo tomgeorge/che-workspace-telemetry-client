@@ -13,6 +13,7 @@ package org.eclipse.che.incubator.workspace.telemetry.base;
 
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.slf4j.Logger;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Map;
@@ -21,10 +22,10 @@ public class DefaultAnalyticsManager extends AbstractAnalyticsManager {
   private static final Logger LOG = getLogger(DefaultAnalyticsManager.class);
 
   public DefaultAnalyticsManager(
-    String apiEndpoint,
-    String workspaceId,
-    HttpJsonRequestFactory requestFactory) {
-      super(apiEndpoint, workspaceId, requestFactory);
+      String apiEndpoint,
+      String workspaceId,
+      HttpJsonRequestFactory requestFactory) {
+    super(apiEndpoint, workspaceId, requestFactory);
   }
 
   @Override
@@ -39,7 +40,7 @@ public class DefaultAnalyticsManager extends AbstractAnalyticsManager {
 
   @Override
   public void onEvent(String userId, AnalyticsEvent event, Map<String, Object> properties, String ip,
-      String userAgent) {
+                      String userAgent) {
     LOG.info("Event triggered by user {} from ip {} on agent {} :\n{}\nwith properties:\n{}", userId, ip, userAgent, event, properties);
   }
 

@@ -11,27 +11,27 @@ import static io.restassured.RestAssured.given;
 
 @NativeImageTest
 public class NativeTelemetryResourceIT extends TelemetryResourceTest {
-    @Test
-    public void testEvent() {
-        ArrayList<EventProperty> properties = new ArrayList<EventProperty>();
-        Event e = new Event("WORKSPACE_STARTED", "user1", "1", "127.0.0.1", "curl", "", properties);
-        given()
-                .when()
-                .contentType("application/json")
-                .body("{\"id\": \"WORKSPACE_STARTED\", \"userId\": \"admin\", \"ip\": \"127.0.0.1\"}")
-                .post("/telemetry/event")
-                .then()
-                .statusCode(200);
-    }
+  @Test
+  public void testEvent() {
+    ArrayList<EventProperty> properties = new ArrayList<EventProperty>();
+    Event e = new Event("WORKSPACE_STARTED", "user1", "1", "127.0.0.1", "curl", "", properties);
+    given()
+        .when()
+        .contentType("application/json")
+        .body("{\"id\": \"WORKSPACE_STARTED\", \"userId\": \"admin\", \"ip\": \"127.0.0.1\"}")
+        .post("/telemetry/event")
+        .then()
+        .statusCode(200);
+  }
 
-    @Test
-    public void testActivity() {
-        given()
-                .when()
-                .contentType("application/json")
-                .body("{\"userId\": \"alice\"}")
-                .post("/telemetry/activity")
-                .then()
-                .statusCode(200);
-    }
+  @Test
+  public void testActivity() {
+    given()
+        .when()
+        .contentType("application/json")
+        .body("{\"userId\": \"alice\"}")
+        .post("/telemetry/activity")
+        .then()
+        .statusCode(200);
+  }
 }

@@ -28,23 +28,25 @@ public class EventProperty {
   }
 
   @Schema(
-    description = "Id of the event property",
-    required = true
+      description = "Id of the event property",
+      required = true
   )
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
 
   @Schema(
-    description = "Value of the event property",
-    required = true
+      description = "Value of the event property",
+      required = true
   )
   public String getValue() {
     return value;
   }
+
   public void setValue(String value) {
     this.value = value;
   }
@@ -71,7 +73,7 @@ public class EventProperty {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class EventProperty {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
