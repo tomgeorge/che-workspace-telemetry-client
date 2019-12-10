@@ -121,8 +121,6 @@ public class MockBaseConfiguration extends BaseConfiguration {
 
     @Produces
     protected AbstractAnalyticsManager analyticsManager() {
-        this.apiEndpoint = "http://fake-che.com/api";
-        this.workspaceId = "fake-workspace";
         return new DefaultAnalyticsManager(apiEndpoint, workspaceId, requestFactory());
     }
 

@@ -4,6 +4,8 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.eclipse.che.incubator.workspace.telemetry.model.Activity;
 import org.eclipse.che.incubator.workspace.telemetry.model.Event;
 import org.eclipse.che.incubator.workspace.telemetry.model.EventProperty;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -17,6 +19,18 @@ public class TelemetryResourceTest {
 
     @Inject
     TelemetryResource telemetryResource;
+
+    @BeforeAll
+    public static void setUp() {
+        System.setProperty("che.api", "http://fake-che.com/api");
+        System.setProperty("che.workspace.id", "fake-workspace");
+    }
+
+    @AfterAll
+    public static void tesrDown() {
+        System.clearProperty("che.api");
+        System.clearProperty("che.workspace.id");
+    }
 
     @Test
     public void testActivity() {
