@@ -1,6 +1,6 @@
 {
-  "name": "@dfatwork-pkgs/workspace-telemetry-client",
-  "version": "0.0.1-1574869317",
+  "name": "@eclipse-che/workspace-telemetry-client",
+  "version": "0.0.1-1576077599",
   "description": "",
   "main": "dist/server.js",
   "browser": "dist/client.js",
