@@ -7,6 +7,12 @@
     <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/eclipse-che/che-workspace-telemetry-client</url>
+    </repository>
+  </distributionManagement>
   <artifactId>backend-base</artifactId>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
