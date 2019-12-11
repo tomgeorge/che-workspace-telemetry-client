@@ -19,6 +19,11 @@ jobs:
           mvn package -DskipTests
       - name: print auth token
         run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}\n" >> ~/.npmrc
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: npm publish
         working-directory: ./javascript/src/typescript
-        run: NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          # npm uses the NODE_AUTH_TOKEN environment variable
+        run: NODE_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
