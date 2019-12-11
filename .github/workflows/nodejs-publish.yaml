@@ -16,7 +16,7 @@ jobs:
           java-version: 1.8
       - name: run mvn package
         run: |
-          mvn package
+          mvn package -DskipTests
       - name: print auth token
         run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}\n" >> ~/.npmrc
       - name: npm publish
