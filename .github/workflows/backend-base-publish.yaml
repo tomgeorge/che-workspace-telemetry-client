@@ -1,4 +1,4 @@
-name: Master CI
+name: backend-base publish
 
 on: 
   push:
