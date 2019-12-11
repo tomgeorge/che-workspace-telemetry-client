@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['10', '8']
+        node: ['10']
         java: ['1.8']
     steps:
       - uses: actions/checkout@v1
@@ -19,11 +19,5 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - name: mvn package
+      - name: mvn package (also runs npm test && npm build)
         run: mvn package -DskipTests
-      - name: NPM
-        working-directory: ./javascript/src/typescript
-        run: |
-          npm install
-          npm run build
-          NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
