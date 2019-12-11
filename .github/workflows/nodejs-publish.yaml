@@ -26,4 +26,4 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           # npm uses the NODE_AUTH_TOKEN environment variable
-        run: npm publish
+        run: npm run publish:next
