@@ -21,9 +21,8 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: mvn package
         run: mvn package -DskipTests
-      - name: change directory
-        run: cd javascript/src/typescript
       - name: NPM
+        working-directory: ./javascript/src/typescript
         run: |
           npm install
           npm run build
