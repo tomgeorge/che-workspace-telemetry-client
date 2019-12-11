@@ -1,0 +1,23 @@
+name: NodeJS CI
+
+on: [push]
+  
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['10', '8']
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+      - name: Set up NPM
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: NPM
+        run: |
+          cd javascript/src/typescript && npm install
+          cd javascript/src/typescript && npm run build
+          cd javascript/src/typescript && NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
