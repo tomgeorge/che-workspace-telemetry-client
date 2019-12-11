@@ -21,8 +21,10 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: mvn package
         run: mvn package -DskipTests
+      - name: change directory
+        run: cd javascript/src/typescript
       - name: NPM
         run: |
-          cd javascript/src/typescript && npm install
-          cd javascript/src/typescript && npm run build
-          cd javascript/src/typescript && NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
+          npm install
+          npm run build
+          NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
