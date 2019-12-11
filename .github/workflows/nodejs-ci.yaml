@@ -8,9 +8,12 @@ jobs:
     strategy:
       matrix:
         node: ['10', '8']
+        java: ['1.8']
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
+        with:
+          java-version: ${{ matrix.java }}
         uses: actions/setup-java@v1
       - name: Set up NPM
         uses: actions/setup-node@v1
