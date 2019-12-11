@@ -4,12 +4,9 @@ on:
   push:
     branches:
       master
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v1
     - name: Set up JDK 1.8
@@ -19,6 +16,7 @@ jobs:
     - name: Build with Maven
       working-directory: ./backend-base
       run: |
+        mkdir -p ~/.m2
         echo "<settings><servers><server><id>github</id><username>OWNER</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
         mvn -B package deploy -DskipTests --file pom.xml
       env: 
