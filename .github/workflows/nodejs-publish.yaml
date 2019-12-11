@@ -25,4 +25,5 @@ jobs:
         working-directory: ./javascript/src/typescript
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-        run: NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
+          # npm uses the NODE_AUTH_TOKEN environment variable
+        run: NODE_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm publish
