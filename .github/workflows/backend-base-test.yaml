@@ -17,7 +17,7 @@ jobs:
       working-directory: ./backend-base
       run: |
         mkdir -p ~/.m2
-        echo "<settings><servers><server><id>github</id><username>OWNER</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
+        echo "<settings><servers><server><id>github</id><username>x-access-token</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
         mvn -B clean package deploy -Dmaven.wagon.http.pool=false -DskipTests 
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
