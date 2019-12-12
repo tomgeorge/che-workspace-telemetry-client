@@ -14,7 +14,7 @@ jobs:
       with:
         java-version: 1.8
     - name: deploy in docker container
-      run:  docker run --rm -v $HOME/.m2:/root/.m2 -v $(pwd):/work -w /work maven:3.3.1-jdk-8 cd backend-base && mvn deploy
+      run:  docker run --rm -v $HOME/.m2:/root/.m2 -v $(pwd):/work -w /work maven:3.3.1-jdk-8 && mvn deploy -pl backend-base
     - name: Build with Maven
       working-directory: ./backend-base
       run: |
