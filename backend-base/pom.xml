@@ -14,7 +14,7 @@
     </repository>
   </distributionManagement>
   <artifactId>backend-base</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.parameters>true</maven.compiler.parameters>
