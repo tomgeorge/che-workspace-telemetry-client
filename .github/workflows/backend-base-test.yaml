@@ -19,6 +19,7 @@ jobs:
         mkdir -p ~/.m2
         echo "<settings><servers><server><id>github</id><username>OWNER</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
         VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        mvn -B clean deploy -DskipTests -Dtoken=${GITHUB_TOKEN} --file pom.xml -Dfile=target/backend-base-${VERSION}.jar
+        echo $VERSION
+        mvn -B clean deploy -Dmaven.wagon.http.pool=false -DskipTests -Dtoken=${GITHUB_TOKEN} --file pom.xml -Dfile=target/backend-base-${VERSION}.jar
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
