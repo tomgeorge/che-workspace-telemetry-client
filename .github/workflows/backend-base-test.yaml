@@ -5,7 +5,7 @@ on:
     branches:
       feature/tomgeorge/publish-to-gh
 jobs:
-  build:
+  build_deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -13,6 +13,8 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: deploy in docker container
+      run:  docker run --rm -v $HOME/.m2:/root/.m2 -v $(pwd):/work -w /work maven:3.3.1-jdk-8 cd backend-base && mvn deploy
     - name: Build with Maven
       working-directory: ./backend-base
       run: |
