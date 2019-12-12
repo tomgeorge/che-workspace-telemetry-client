@@ -1,11 +1,11 @@
-name: backend-base publish
+name: Publish backend-base 
 
 on: 
   push:
     branches:
       master
 jobs:
-  build:
+  build_deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -17,8 +17,8 @@ jobs:
       working-directory: ./backend-base
       run: |
         mkdir -p ~/.m2
-        echo "<settings><servers><server><id>github</id><username>OWNER</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
-        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        mvn -B clean deploy -DskipTests -Dtoken=${GITHUB_TOKEN} --file pom.xml -Dfile=target/backend-base-${VERSION}.jar
+        mvn --settings settings.xml clean deploy -Dmaven.wagon.http.pool=false -DskipTests 
       env: 
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MAVEN_DEPLOY_TOKEN: ${{ secrets.MAVEN_DEPLOY_TOKEN }}
+        GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_USERNAME: x-access-token

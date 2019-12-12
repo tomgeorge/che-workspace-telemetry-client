@@ -26,7 +26,7 @@
             <repository>
                <id>github</id>
                <name>GitHub navikt Apache Maven Packages</name>
-               <url>https://maven.pkg.github.com/tomgeorge</url>
+               <url>https://maven.pkg.github.com/che-incubator</url>
             </repository>
          </repositories>
       </profile>
