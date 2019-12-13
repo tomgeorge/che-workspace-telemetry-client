@@ -1,6 +1,5 @@
 package org.eclipse.che.incubator.workspace.telemetry.base;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.quarkus.test.Mock;
 import org.eclipse.che.api.core.*;
 import org.eclipse.che.api.core.rest.*;
@@ -22,10 +21,6 @@ public class MockBaseConfiguration extends BaseConfiguration {
 
         public MockHttpRequest() {
             mockResponse = this.getMockResponse();
-            if (mockResponse.equals("")) {
-                System.err.println("No mock response found");
-                System.exit(1);
-            }
         }
 
         @Override
@@ -45,7 +40,6 @@ public class MockBaseConfiguration extends BaseConfiguration {
             } catch(IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
-                System.out.println("Error reading from mock-response.json.  Confirm the file exists");
                 e.printStackTrace();
             }
             return workspaceResponse;
