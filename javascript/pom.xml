@@ -12,6 +12,7 @@
         <dependency>
             <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
             <artifactId>backend-base</artifactId>
+            <version>0.0.3</version>
             <classifier>resources</classifier>
             <type>zip</type>
         </dependency>
