@@ -223,6 +223,9 @@
               <includes>
                 <include>**/*IT.java</include>
               </includes>
+              <excludes>
+                <exclude>**/Native*IT.java</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>
