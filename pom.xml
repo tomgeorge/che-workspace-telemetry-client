@@ -8,6 +8,9 @@
         <module>backend-base</module>
         <module>javascript</module>
     </modules>
+    <properties>
+        <backend-base-version>0.0.3</backend-base-version>
+    </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -15,7 +18,7 @@
                 <artifactId>backend-base</artifactId>
                 <classifier>resources</classifier>
                 <type>zip</type>
-                <version>0.0.3</version>
+                <version>${backend-base-version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
