@@ -9,7 +9,7 @@
   <distributionManagement>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/che-incubator/che-workspace-telemetry-client</url>
+      <url>https://maven.pkg.github.com/tomgeorge/che-workspace-telemetry-client</url>
     </repository>
   </distributionManagement>
   <artifactId>backend-base</artifactId>
