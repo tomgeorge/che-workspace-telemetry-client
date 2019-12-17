@@ -20,9 +20,6 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git commit -m "CI: Update backend-base version" -a
-        git push https://x-access-token:$GITHUB_TOKEN@github.com/tomgeorge/che-workspace-telemetry-client.git origin tomgeorge/finalize-maven-config
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Build with Maven
       working-directory: ./backend-base
       run: |
@@ -31,3 +28,8 @@ jobs:
       env: 
         GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_USERNAME: x-access-token
+    - name: Push release commit
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: 'tomgeorge/finalize-maven-config'
