@@ -20,4 +20,4 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: mvn package (also runs npm test && npm build)
-        run: mvn package 
+        run: mvn package -DskipITs
