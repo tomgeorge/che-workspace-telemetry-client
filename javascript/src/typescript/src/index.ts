@@ -9,7 +9,7 @@
  **********************************************************************/
 
 import axios, {AxiosInstance, AxiosPromise, AxiosResponse, AxiosError, AxiosRequestConfig} from 'axios';
-import {DefaultApiFactory, DefaultApiInterface, Activity, Event} from './openapi/api';
+import {DefaultApiFactory, DefaultApiInterface, Event} from './openapi/api';
 import {ConfigurationParameters, Configuration} from './openapi/configuration';
 export * from './openapi/configuration';
 export * from './openapi/api';
@@ -39,8 +39,8 @@ export class TelemetryClient implements TelemetryApi {
         });
     }
 
-    activity(activity: Activity, options?: any): Promise<string> {
-        return this.wrapInPromise(this.delegate.activity, activity);
+    activity(options?: any): Promise<string> {
+        return this.wrapInPromise(this.delegate.activity);
     }
 
     event(event: Event, options?: any): Promise<string> {

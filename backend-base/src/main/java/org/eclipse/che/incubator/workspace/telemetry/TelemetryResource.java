@@ -14,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.che.incubator.workspace.telemetry.base.AbstractAnalyticsManager;
 import org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent;
-import org.eclipse.che.incubator.workspace.telemetry.model.Activity;
 import org.eclipse.che.incubator.workspace.telemetry.model.Event;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -48,27 +47,21 @@ public class TelemetryResource {
                 event.getProperties().stream()
                 .collect(Collectors.toMap(e->e.getId(), e->e.getValue()));
 
-                analyticsManager.onActivity(event.getUserId());
-                analyticsManager.onEvent(event.getUserId(),  AnalyticsEvent.valueOf(event.getId()), params, event.getIp(), event.getAgent());
+                analyticsManager.onActivity();
+                analyticsManager.onEvent(AnalyticsEvent.valueOf(event.getId()), event.getOwnerId(), event.getIp(), event.getAgent(), event.getResolution(), params);
                 return "";
       }
 
     @POST
     @Path("/activity")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Notifies that some activity is still occuring from a given user",
     description = "Notifies that some activity is still occuring for a given user. This will allow maintaining the current session alive for telemetry backends that manage user sessions.",
     operationId = "activity")
     @APIResponse(responseCode = "200", description = "Notification was successfully submitted")
-    public String activity(
-        @RequestBody(
-            description = "Activity to notify",
-            required = true
-        )
-        Activity activity
-    ) {
-        analyticsManager.onActivity(activity.getUserId());
+    public String activity() {
+        analyticsManager.onActivity();
         return "";
     }
 

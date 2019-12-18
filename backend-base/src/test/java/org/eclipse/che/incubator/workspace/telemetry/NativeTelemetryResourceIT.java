@@ -14,7 +14,7 @@ public class NativeTelemetryResourceIT extends TelemetryResourceTest {
     @Test
     public void testEvent() {
         ArrayList<EventProperty> properties = new ArrayList<EventProperty>();
-        Event e = new Event("WORKSPACE_STARTED", "user1", "1", "127.0.0.1", "curl", "", properties);
+        Event e = new Event("WORKSPACE_STARTED", "1", "127.0.0.1", "curl", "", properties);
         given()
                 .when()
                 .contentType("application/json")

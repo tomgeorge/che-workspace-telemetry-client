@@ -23,8 +23,9 @@ public class DefaultAnalyticsManager extends AbstractAnalyticsManager {
   public DefaultAnalyticsManager(
     String apiEndpoint,
     String workspaceId,
+    String machineToken,
     HttpJsonRequestFactory requestFactory) {
-      super(apiEndpoint, workspaceId, requestFactory);
+      super(apiEndpoint, workspaceId, machineToken, requestFactory);
   }
 
   @Override
@@ -33,14 +34,14 @@ public class DefaultAnalyticsManager extends AbstractAnalyticsManager {
   }
 
   @Override
-  public void onActivity(String userId) {
-    LOG.info("Activity from user {}", userId);
+  public void onActivity() {
+    LOG.info("Activity from user {}", getUserId());
   }
 
   @Override
-  public void onEvent(String userId, AnalyticsEvent event, Map<String, Object> properties, String ip,
-      String userAgent) {
-    LOG.info("Event triggered by user {} from ip {} on agent {} :\n{}\nwith properties:\n{}", userId, ip, userAgent, event, properties);
+  public void onEvent(AnalyticsEvent event, String ownerId, String ip,
+      String userAgent, String resolution, Map<String, Object> properties) {
+    LOG.info("Event triggered by user {} in {} from ip {} on agent {} :\n{}\nwith resolution: {}\nwith properties:\n{}", getUserId(), ownerId, ip, userAgent, event, resolution, properties);
   }
 
   @Override

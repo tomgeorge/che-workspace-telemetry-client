@@ -20,24 +20,21 @@ public class BaseConfiguration {
     
     @ConfigProperty(name = "che.workspace.id")
     protected String workspaceId;
+    
+    @ConfigProperty(name = "che.machine.token", defaultValue = "")
+    protected String machineToken;
 
     private HttpJsonRequestFactory requestFactory() {
         return new DefaultHttpJsonRequestFactory() {
 
-            private final String machineToken = System.getenv("CHE_MACHINE_TOKEN");
-
             @Override
             public HttpJsonRequest fromUrl(String url) {
-              return super.fromUrl(url).setAuthorizationHeader(getMachineToken());
+              return super.fromUrl(url).setAuthorizationHeader(machineToken);
             }
           
             @Override
             public HttpJsonRequest fromLink(Link link) {
-              return super.fromLink(link).setAuthorizationHeader(getMachineToken());
-            }
-          
-            private String getMachineToken() {
-              return machineToken;
+              return super.fromLink(link).setAuthorizationHeader(machineToken);
             }
         };
     }
@@ -45,6 +42,6 @@ public class BaseConfiguration {
     @Produces
     @DefaultBean
     protected AbstractAnalyticsManager analyticsManager() {
-      return new DefaultAnalyticsManager(apiEndpoint, workspaceId, requestFactory());
+      return new DefaultAnalyticsManager(apiEndpoint, workspaceId, machineToken, requestFactory());
     }
 }

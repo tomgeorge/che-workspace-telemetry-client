@@ -8,12 +8,15 @@ package org.eclipse.che.incubator.workspace.telemetry.model;
 
 import java.util.Objects;
 
+import org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent;
+import org.eclipse.che.incubator.workspace.telemetry.base.EventProperties;
+import org.eclipse.microprofile.openapi.annotations.ExternalDocumentation;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-/**
- * EventProperties
- */
-
+@Schema(
+  title = "Event property definition",
+  description = "Definition of a additional property of an event."
+)
 public class EventProperty {
 
   public String id;
@@ -29,7 +32,8 @@ public class EventProperty {
 
   @Schema(
     description = "Id of the event property",
-    required = true
+    required = true,
+    example = EventProperties.PROGRAMMING_LANGUAGE
   )
   public String getId() {
     return id;
@@ -40,7 +44,8 @@ public class EventProperty {
 
   @Schema(
     description = "Value of the event property",
-    required = true
+    required = true,
+    example = "java"
   )
   public String getValue() {
     return value;

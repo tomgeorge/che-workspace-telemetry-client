@@ -12,6 +12,10 @@
 package org.eclipse.che.incubator.workspace.telemetry.base;
 
 import static java.lang.Long.parseLong;
+import static org.eclipse.che.multiuser.machine.authentication.shared.Constants.USER_ID_CLAIM;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.util.Map;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -28,6 +32,8 @@ import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import java.io.IOException;
 import java.util.Map;
 
@@ -35,6 +41,7 @@ public abstract class AbstractAnalyticsManager {
   private static final Logger LOG = getLogger(AbstractAnalyticsManager.class);
 
   protected final String workspaceId;
+  protected String userId = "";
 
   @VisibleForTesting final protected String workspaceName;
   @VisibleForTesting final protected String factoryId;
@@ -57,10 +64,7 @@ public abstract class AbstractAnalyticsManager {
 
   private HttpJsonRequestFactory requestFactory;
 
-  public AbstractAnalyticsManager(
-      String apiEndpoint,
-      String workspaceId,
-      HttpJsonRequestFactory requestFactory) {
+  public AbstractAnalyticsManager(String apiEndpoint, String workspaceId, String machineToken, HttpJsonRequestFactory requestFactory) {
     this.workspaceId = workspaceId;
     this.requestFactory = requestFactory;
 
@@ -172,6 +176,25 @@ public abstract class AbstractAnalyticsManager {
     } else {
       workspaceName = null;
     }
+
+    if (machineToken != null && ! machineToken.isEmpty()) {
+      try {
+      JwtParser jwtParser = Jwts.parser();
+        String[] splitted = machineToken.split("\\.");
+        if (splitted.length != 3) {
+          LOG.warn("Cannot retrieve user Id from the machine token: invalid token");
+        } else {
+          Object userIdClaim = jwtParser.parseClaimsJwt(splitted[0]+ "." + splitted[1] + ".").getBody().get(USER_ID_CLAIM);
+          if (userIdClaim == null) {
+            LOG.warn("Cannot retrieve user Id from the machine token: No '{}' claim", USER_ID_CLAIM);
+          } else {
+            userId = userIdClaim.toString();
+          }
+        }
+      } catch (Exception e) {
+        LOG.warn("Cannot retrieve user Id from the machine token", e);
+      }
+    }
   }
 
   private Workspace getWorkspace(String endpoint) {
@@ -192,16 +215,21 @@ public abstract class AbstractAnalyticsManager {
     return workspaceId;
   }
 
+  public final String getUserId() {
+    return userId;
+  }
+
   public abstract boolean isEnabled();
 
-  public abstract void onActivity(String userId);
+  public abstract void onActivity();
 
   public abstract void onEvent(
-      String userId,
       AnalyticsEvent event,
-      Map<String, Object> properties,
+      String ownerId,
       String ip,
-      String userAgent);
+      String userAgent,
+      String resolution,
+      Map<String, Object> properties);
 
   public abstract void destroy();
 }

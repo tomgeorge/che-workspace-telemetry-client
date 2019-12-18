@@ -1,7 +1,6 @@
 package org.eclipse.che.incubator.workspace.telemetry;
 
 import io.quarkus.test.junit.QuarkusTest;
-import org.eclipse.che.incubator.workspace.telemetry.model.Activity;
 import org.eclipse.che.incubator.workspace.telemetry.model.Event;
 import org.eclipse.che.incubator.workspace.telemetry.model.EventProperty;
 import org.junit.jupiter.api.AfterAll;
@@ -34,15 +33,14 @@ public class TelemetryResourceTest {
 
     @Test
     public void testActivity() {
-        Activity activity = new Activity("user1");
-        String response = telemetryResource.activity(activity);
+        String response = telemetryResource.activity();
         assertEquals("", response);
     }
 
     @Test
     public void testEvent() {
         ArrayList<EventProperty> properties = new ArrayList<EventProperty>();
-        Event e = new Event("WORKSPACE_STARTED", "user1", "1", "127.0.0.1", "curl", "", properties);
+        Event e = new Event("WORKSPACE_STARTED", "1", "127.0.0.1", "curl", "", properties);
         String response = telemetryResource.event(e);
         assertEquals("", response);
     }

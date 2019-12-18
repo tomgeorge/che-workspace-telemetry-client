@@ -14,7 +14,6 @@ import java.util.Map;
 
 @Mock
 public class MockBaseConfiguration extends BaseConfiguration {
-
     private class MockHttpRequest implements HttpJsonRequest {
 
         private String mockResponse;
@@ -95,8 +94,6 @@ public class MockBaseConfiguration extends BaseConfiguration {
    private HttpJsonRequestFactory requestFactory() {
         return new DefaultHttpJsonRequestFactory() {
 
-            private final String machineToken = "FAKE_CHE_MACHINE_TOKEN";
-
             @Override
             public HttpJsonRequest fromUrl(String url) {
                 return new MockHttpRequest();
@@ -106,16 +103,12 @@ public class MockBaseConfiguration extends BaseConfiguration {
             public HttpJsonRequest fromLink(Link link) {
                 return new MockHttpRequest();
             }
-
-            private String getMachineToken() {
-                return machineToken;
-            }
         };
     }
 
     @Produces
     protected AbstractAnalyticsManager analyticsManager() {
-        return new DefaultAnalyticsManager(apiEndpoint, workspaceId, requestFactory());
+        return new DefaultAnalyticsManager(apiEndpoint, workspaceId, machineToken, requestFactory());
     }
 
 }

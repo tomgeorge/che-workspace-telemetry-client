@@ -20,14 +20,13 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Event
- */
-
+@Schema(
+  title = "Event definition",
+  description = "Definition of a telemetry event.\n The `userId` and workspaceId are not provided since they should be guessed by the backend."
+)
 public class Event {
 
   public String id;
-  public String userId;
   public String ownerId;
   public String ip;
   public String agent;
@@ -39,14 +38,12 @@ public class Event {
 
   public Event(
     String id,
-    String userId,
     String ownerId,
     String ip,
     String agent,
     String resolution,
     List<EventProperty> properties) {
       this.id = id;
-      this.userId = userId;
       this.ownerId = ownerId;
       this.ip = ip;
       this.agent = agent;
@@ -57,24 +54,13 @@ public class Event {
   @Schema(
     description = "Identifier of the event type",
     required = true,
-    example = "WORKSPACE_USED"
+    example = "EDITOR_USED"
   )
   public String getId() {
     return id;
   }
   public void setId(String id) {
     this.id = id;
-  }
-
-  @Schema(
-    description = "Identifier of the user that issued the event",
-    required = true
-  )
-  public String getUserId() {
-    return userId;
-  }
-  public void setUserId(String userId) {
-    this.userId = userId;
   }
 
   @Schema(
@@ -146,7 +132,6 @@ public class Event {
     }
     Event event = (Event) o;
     return Objects.equals(this.id, event.id) &&
-        Objects.equals(this.userId, event.userId) &&
         Objects.equals(this.ownerId, event.ownerId) &&
         Objects.equals(this.ip, event.ip) &&
         Objects.equals(this.agent, event.agent) &&
@@ -155,7 +140,7 @@ public class Event {
 
   @Override
   public int hashCode() {
-    return java.util.Objects.hash(id, userId, ownerId, ip, agent, properties);
+    return java.util.Objects.hash(id, ownerId, ip, agent, properties);
   }
 
   @Override
@@ -164,7 +149,6 @@ public class Event {
     sb.append("class Event {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("    ownerId: ").append(toIndentedString(ownerId)).append("\n");
     sb.append("    ip: ").append(toIndentedString(ip)).append("\n");
     sb.append("    agent: ").append(toIndentedString(agent)).append("\n");
