@@ -6,13 +6,13 @@
         <version>0.0.1</version>
     </parent>
     <artifactId>javascript</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
             <artifactId>backend-base</artifactId>
-            <version>0.0.3</version>
+            <version>${backend-base-version}</version>
             <classifier>resources</classifier>
             <type>zip</type>
         </dependency>
