@@ -9,7 +9,7 @@
         <module>javascript</module>
     </modules>
     <properties>
-        <backend-base-version>0.0.13</backend-base-version>
+        <backend-base-version>0.0.3</backend-base-version>
     </properties>
     <dependencyManagement>
         <dependencies>
