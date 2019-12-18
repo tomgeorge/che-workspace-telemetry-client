@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.2-SNAPSHOT</version>
     </parent>
     <distributionManagement>
         <repository>
@@ -38,7 +38,33 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-        <dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.oracle.substratevm</groupId>
+            <artifactId>svm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-jsonb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-api-model</artifactId>
@@ -52,6 +78,17 @@
                 <exclusion>
                     <groupId>org.eclipse.che.core</groupId>
                     <artifactId>che-core-api-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.multiuser</groupId>
+            <artifactId>che-multiuser-machine-authentication-shared</artifactId>
+            <version>7.4.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.che.core</groupId>
+                    <artifactId>che-core-api-dto</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -75,17 +112,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.che.multiuser</groupId>
-            <artifactId>che-multiuser-machine-authentication-shared</artifactId>
-            <version>7.4.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.che.core</groupId>
-                    <artifactId>che-core-api-dto</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
@@ -98,6 +124,10 @@
                 <exclusion>
                     <groupId>org.eclipse.che.core</groupId>
                     <artifactId>che-core-api-dto</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.che.core</groupId>
+                    <artifactId>che-core-api-core</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.che.core</groupId>
@@ -194,13 +224,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M3</version>
-                <configuration>
-                    <excludes>**/Native*IT.java</excludes>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire-plugin.version}</version>
                 <configuration>
@@ -208,6 +231,23 @@
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                     </systemProperties>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/Native*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -223,30 +263,31 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>3.0.0-M4</version>
+                        <version>3.0.0-M3</version>
                         <executions>
                             <execution>
                                 <goals>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
                                 </goals>
+                                <configuration>
+                                    <systemProperties>
+                                        <native.image.path>
+                                            ${project.build.directory}/${project.build.finalName}-runner
+                                        </native.image.path>
+                                    </systemProperties>
+                                    <includes>
+                                        <include>**/Native*IT.java</include>
+                                    </includes>
+                                </configuration>
                             </execution>
                         </executions>
-                        <configuration>
-                            <excludes>**/Native*IT.java</excludes>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${surefire-plugin.version}</version>
-                        <configuration>
-                            <systemProperties>
-                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-                            </systemProperties>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
+            <properties>
+                <quarkus.package.type>native</quarkus.package.type>
+            </properties>
         </profile>
     </profiles>
 </project>
