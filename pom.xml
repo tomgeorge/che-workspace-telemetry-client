@@ -42,8 +42,6 @@
                             <configuration>
                                     <excludeTransitive>true</excludeTransitive>
                                     <outputDirectory>${project.build.directory}/api</outputDirectory>
-                                    <groupId>org.eclipse.che.incubator.workspace-telemetry-client</groupId>
-                                    <artifactId>backend-base</artifactId>
                                     <classifier>resources</classifier>
                                     <type>zip</type>
                             </configuration>
