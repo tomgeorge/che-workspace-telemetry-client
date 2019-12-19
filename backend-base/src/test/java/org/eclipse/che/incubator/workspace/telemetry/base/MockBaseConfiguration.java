@@ -91,7 +91,7 @@ public class MockBaseConfiguration extends BaseConfiguration {
         }
     }
 
-   private HttpJsonRequestFactory requestFactory() {
+   protected HttpJsonRequestFactory requestFactory() {
         return new DefaultHttpJsonRequestFactory() {
 
             @Override

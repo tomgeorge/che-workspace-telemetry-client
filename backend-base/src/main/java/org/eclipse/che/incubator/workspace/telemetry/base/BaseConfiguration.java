@@ -15,23 +15,23 @@ import io.quarkus.arc.DefaultBean;
 @Dependent
 @Default
 public class BaseConfiguration {
-    @ConfigProperty(name = "che.api") 
+    @ConfigProperty(name = "che.api")
     protected String apiEndpoint;
-    
+
     @ConfigProperty(name = "che.workspace.id")
     protected String workspaceId;
-    
+
     @ConfigProperty(name = "che.machine.token", defaultValue = "")
     protected String machineToken;
 
-    private HttpJsonRequestFactory requestFactory() {
+    protected HttpJsonRequestFactory requestFactory() {
         return new DefaultHttpJsonRequestFactory() {
 
             @Override
             public HttpJsonRequest fromUrl(String url) {
               return super.fromUrl(url).setAuthorizationHeader(machineToken);
             }
-          
+
             @Override
             public HttpJsonRequest fromLink(Link link) {
               return super.fromLink(link).setAuthorizationHeader(machineToken);
