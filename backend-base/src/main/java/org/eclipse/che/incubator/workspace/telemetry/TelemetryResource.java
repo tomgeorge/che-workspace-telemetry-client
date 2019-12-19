@@ -54,7 +54,7 @@ public class TelemetryResource {
 
     @POST
     @Path("/activity")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Notifies that some activity is still occuring from a given user",
     description = "Notifies that some activity is still occuring for a given user. This will allow maintaining the current session alive for telemetry backends that manage user sessions.",
