@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.1</version>
+        <version>${parent-version}</version>
     </parent>
     <artifactId>javascript</artifactId>
     <version>${javascript-version}</version>

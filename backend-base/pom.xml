@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
     <artifactId>parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>${parent-version}</version>
   </parent>
   <distributionManagement>
     <repository>
