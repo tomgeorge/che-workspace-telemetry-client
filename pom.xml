@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
     <artifactId>parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>${parent-version}</version>
     <packaging>pom</packaging>
     <modules>
         <module>backend-base</module>
@@ -10,6 +10,7 @@
     </modules>
     <properties>
         <backend-base-version>0.0.3</backend-base-version>
+        <parent-version>0.0.3</parent-version>
     </properties>
     <dependencyManagement>
         <dependencies>
