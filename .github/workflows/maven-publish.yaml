@@ -14,7 +14,10 @@ jobs:
       with:
         java-version: 1.8
     - name: Update version
-      run: ./update-versions.sh
+      uses: actions/setup-python@v1
+      run: |
+        pip install --user yq
+        ./update-versions.sh
     - name: Make release commit
       run: |
         git config --local user.email "action@github.com"
