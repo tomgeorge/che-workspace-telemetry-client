@@ -21,7 +21,6 @@ jobs:
         git config --local user.name "GitHub Action"
         git commit -m "CI: Update backend-base version" -a
     - name: Build with Maven
-      working-directory: ./backend-base
       run: |
         mkdir -p ~/.m2
         mvn --settings settings.xml clean deploy -Dmaven.wagon.http.pool=false -DskipITs
