@@ -1,19 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
   <artifactId>parent</artifactId>
-  <version>${parent-version}</version>
+  <version>0.0.3</version>
   <packaging>pom</packaging>
   <modules>
     <module>backend-base</module>
     <module>javascript</module>
   </modules>
-  <properties>
-    <backend-base-version>0.0.3</backend-base-version>
-    <parent-version>0.0.3</parent-version>
-    <javascript-version>0.0.3</javascript-version>
-  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -21,10 +15,16 @@
         <artifactId>backend-base</artifactId>
         <classifier>resources</classifier>
         <type>zip</type>
-        <version>${backend-base-version}</version>
+        <version>0.0.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/che-incubator/che-workspace-telemetry-client</url>
+    </repository>
+  </distributionManagement>
   <build>
     <pluginManagement>
       <plugins>
