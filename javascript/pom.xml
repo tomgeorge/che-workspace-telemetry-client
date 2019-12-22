@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
     <artifactId>parent</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.56</version>
   </parent>
   <distributionManagement>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/che-incubator/che-workspace-telemetry-client</url>
+      <url>${repository-url}</url>
     </repository>
   </distributionManagement>
   <artifactId>javascript</artifactId>

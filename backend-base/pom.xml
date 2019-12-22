@@ -5,16 +5,16 @@
   <parent>
     <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
     <artifactId>parent</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.56</version>
   </parent>
   <distributionManagement>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/che-incubator/che-workspace-telemetry-client</url>
+      <url>${repository-url}</url>
     </repository>
   </distributionManagement>
   <artifactId>backend-base</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.56</version>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.parameters>true</maven.compiler.parameters>
@@ -231,23 +231,6 @@
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
           </systemProperties>
         </configuration>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <phase>integration-test</phase>
-            <configuration>
-              <includes>
-                <include>**/*IT.java</include>
-              </includes>
-              <excludes>
-                <exclude>**/Native*IT.java</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
