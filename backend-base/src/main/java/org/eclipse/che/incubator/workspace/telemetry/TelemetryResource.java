@@ -1,7 +1,13 @@
 package org.eclipse.che.incubator.workspace.telemetry;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import io.quarkus.runtime.ShutdownEvent;
+import io.quarkus.runtime.StartupEvent;
+import org.eclipse.che.incubator.workspace.telemetry.base.AbstractAnalyticsManager;
+import org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent;
+import org.eclipse.che.incubator.workspace.telemetry.model.Event;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -11,21 +17,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-import org.eclipse.che.incubator.workspace.telemetry.base.AbstractAnalyticsManager;
-import org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent;
-import org.eclipse.che.incubator.workspace.telemetry.model.Event;
-import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-
-import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("/")
 @ApplicationScoped
 public class TelemetryResource {
+
     @Inject
     AbstractAnalyticsManager analyticsManager;
 
