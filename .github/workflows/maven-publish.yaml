@@ -25,7 +25,11 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git commit -m "CI: Update release versions" -a
-    - name: Build with Maven
+    - name: Maven install
+      run: |
+        mkdir -p ~/.m2
+        mvn --settings settings.xml clean install -Dmaven.wagon.http.pool=false -DskipITs
+    - name: Maven Deploy
       run: |
         mkdir -p ~/.m2
         mvn --settings settings.xml clean deploy -Dmaven.wagon.http.pool=false -DskipITs
