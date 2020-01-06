@@ -6,6 +6,7 @@ import org.eclipse.che.incubator.workspace.telemetry.model.Event;
 import org.eclipse.che.incubator.workspace.telemetry.model.EventProperty;
 import org.junit.jupiter.api.Test;
 
+import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 
 import static io.restassured.RestAssured.*;
@@ -30,8 +31,7 @@ public class TelemetryResourceIT {
     public void testActivity() {
         given()
                 .when()
-                .contentType("application/json")
-                .body("{\"userId\": \"alice\"}")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .post("/telemetry/activity")
                 .then()
                 .statusCode(200);

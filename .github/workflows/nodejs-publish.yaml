@@ -27,3 +27,13 @@ jobs:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           # npm uses the NODE_AUTH_TOKEN environment variable
         run: npm run publish:next
+      - name: Make release commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "CI: Update javascript telemetry client version" -a
+      - name: Push release commit
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: 'master'

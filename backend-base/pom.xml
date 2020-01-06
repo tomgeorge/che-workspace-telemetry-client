@@ -1,19 +1,20 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
     <artifactId>parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.56</version>
   </parent>
   <distributionManagement>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/che-incubator/che-workspace-telemetry-client</url>
+      <url>${repository-url}</url>
     </repository>
   </distributionManagement>
   <artifactId>backend-base</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.56</version>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.parameters>true</maven.compiler.parameters>
@@ -70,17 +71,6 @@
       <version>7.4.0</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.che.core</groupId>
-      <artifactId>che-core-commons-logback</artifactId>
-      <version>7.4.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.che.core</groupId>
-          <artifactId>che-core-api-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.che.multiuser</groupId>
       <artifactId>che-multiuser-machine-authentication-shared</artifactId>
       <version>7.4.0</version>
@@ -88,6 +78,22 @@
         <exclusion>
           <groupId>org.eclipse.che.core</groupId>
           <artifactId>che-core-api-dto</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>0.9.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.che.core</groupId>
+      <artifactId>che-core-commons-logback</artifactId>
+      <version>7.4.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.che.core</groupId>
+          <artifactId>che-core-api-core</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -109,11 +115,6 @@
           <artifactId>che-core-api-core</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt</artifactId>
-      <version>0.9.1</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.che.core</groupId>
@@ -190,10 +191,10 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.6.0</version>
         <configuration>
-            <mainClass>org.eclipse.che.incubator.workspace.telemetry.generate.GenerateOpenApiSchema</mainClass>
-            <arguments>
-                <argument>${project.build.directory}/workspace-telemetry-api.yaml</argument>
-            </arguments>
+          <mainClass>org.eclipse.che.incubator.workspace.telemetry.generate.GenerateOpenApiSchema</mainClass>
+          <arguments>
+            <argument>${project.build.directory}/workspace-telemetry-api.yaml</argument>
+          </arguments>
         </configuration>
         <executions>
           <execution>
@@ -208,7 +209,9 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>3.1.1</version>
         <configuration>
-          <descriptors><descriptor>src/assembly/assembly.xml</descriptor></descriptors>
+          <descriptors>
+            <descriptor>src/assembly/assembly.xml</descriptor>
+          </descriptors>
         </configuration>
         <executions>
           <execution>
@@ -228,6 +231,27 @@
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
           </systemProperties>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.0.0-M4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/Native*IT.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/*IT.java</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
