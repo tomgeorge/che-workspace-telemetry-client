@@ -9,7 +9,7 @@
     <module>javascript</module>
   </modules>
   <properties>
-    <repository-url>https://maven.pkg.github.com/tomgeorge/che-workspace-telemetry-client</repository-url>
+    <repository-url>https://maven.pkg.github.com/che-incubator/che-workspace-telemetry-client</repository-url>
   </properties>
   <dependencyManagement>
     <dependencies>
