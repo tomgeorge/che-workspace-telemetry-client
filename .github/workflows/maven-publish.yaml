@@ -20,6 +20,7 @@ jobs:
         pip install --user yq
         export PATH="/home/runner/.local/bin:$PATH"
         ./update-versions.sh
+        cat pom.xml backend-base/pom.xml javascript/pom.xml
     - name: Make release commit
       run: |
         git config --local user.email "action@github.com"
