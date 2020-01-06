@@ -2,14 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.eclipse.che.incubator.workspace-telemetry</groupId>
   <artifactId>parent</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.158</version>
   <packaging>pom</packaging>
   <modules>
     <module>backend-base</module>
     <module>javascript</module>
   </modules>
   <properties>
-    <repository-url>https://maven.pkg.github.com/che-incubator/che-workspace-telemetry-client</repository-url>
+    <repository-url>https://maven.pkg.github.com/tomgeorge/che-workspace-telemetry-client</repository-url>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -18,7 +18,7 @@
         <artifactId>backend-base</artifactId>
         <classifier>resources</classifier>
         <type>zip</type>
-        <version>0.0.3</version>
+        <version>0.0.158</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
