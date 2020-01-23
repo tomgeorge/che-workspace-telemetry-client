@@ -17,7 +17,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.parameters>true</maven.compiler.parameters>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
-    <quarkus.version>1.0.0.Final</quarkus.version>
+    <quarkus.version>1.2.0.Final</quarkus.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -75,7 +75,7 @@
       <exclusions>
         <exclusion>
           <groupId>org.eclipse.che.core</groupId>
-          <artifactId>che-core-api-dto</artifactId>
+          <artifactId>he-core-api-dto</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -149,6 +149,10 @@
         <exclusion>
           <groupId>org.eclipse.che.core</groupId>
           <artifactId>che-core-commons-schedule</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.ws.rs</groupId>
+          <artifactId>javax.ws.rs-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -229,17 +233,13 @@
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
           </systemProperties>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M4</version>
         <executions>
           <execution>
+            <id>integration-test</id>
             <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
+              <goal>test</goal>
             </goals>
+            <phase>integration-test</phase>
             <configuration>
               <excludes>
                 <exclude>**/Native*IT.java</exclude>
