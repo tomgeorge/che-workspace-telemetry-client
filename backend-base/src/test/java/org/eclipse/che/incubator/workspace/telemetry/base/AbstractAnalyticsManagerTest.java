@@ -20,7 +20,7 @@ class AbstractAnalyticsManagerTest {
     public static void setUp() {
         System.setProperty("che.api", "https://fake-che.com/api");
         System.setProperty("che.workspace.id", "fake-workspace");
-        System.setProperty("che.machine.token", "");
+        System.setProperty("che.machine.token", "fake-token");
     }
 
     @AfterAll
