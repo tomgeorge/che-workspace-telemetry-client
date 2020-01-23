@@ -24,52 +24,53 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class TelemetryResource {
 
-    @Inject
-    AbstractAnalyticsManager analyticsManager;
+  @Inject
+  AbstractAnalyticsManager analyticsManager;
 
-    @POST
-    @Path("/event")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    @Operation(summary = "Posts a telemetry event",
+  @POST
+  @Path("/event")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.TEXT_PLAIN)
+  @Operation(summary = "Posts a telemetry event",
     description = "Submit telemetry events to the workspace telemetry manager.\nThe event Id should be the Id of a built-in event or of an alread-registered custom event",
     operationId = "event")
-    @APIResponse(responseCode = "200", description = "Event was successfully submitted")
-    @APIResponse(responseCode = "400", description = "Error during event submission")
-    public String event(
-        @RequestBody(
-            description = "Event to send",
-            required = true)
-        Event event) {
-            Map<String, Object> params =
-                event.getProperties().stream()
-                .collect(Collectors.toMap(e->e.getId(), e->e.getValue()));
+  @APIResponse(responseCode = "200", description = "Event was successfully submitted")
+  @APIResponse(responseCode = "400", description = "Error during event submission")
+  public String event(
+    @RequestBody(
+      description = "Event to send",
+      required = true)
+      Event event) {
+    Map<String, Object> params =
+      event.getProperties().stream()
+        .collect(Collectors.toMap(e -> e.getId(), e -> e.getValue()));
 
-                analyticsManager.onActivity();
-                analyticsManager.onEvent(AnalyticsEvent.valueOf(event.getId()), event.getOwnerId(), event.getIp(), event.getAgent(), event.getResolution(), params);
-                return "";
-      }
+    analyticsManager.onActivity();
+    analyticsManager.onEvent(AnalyticsEvent.valueOf(event.getId()), event.getOwnerId(), event.getIp(), event.getAgent(), event.getResolution(), params);
+    return "";
+  }
 
-    @POST
-    @Path("/activity")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.TEXT_PLAIN)
-    @Operation(summary = "Notifies that some activity is still occuring from a given user",
+  @POST
+  @Path("/activity")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces(MediaType.TEXT_PLAIN)
+  @Operation(summary = "Notifies that some activity is still occuring from a given user",
     description = "Notifies that some activity is still occuring for a given user. This will allow maintaining the current session alive for telemetry backends that manage user sessions.",
     operationId = "activity")
-    @APIResponse(responseCode = "200", description = "Notification was successfully submitted")
-    public String activity() {
-        analyticsManager.onActivity();
-        return "";
-    }
+  @APIResponse(responseCode = "200", description = "Notification was successfully submitted")
+  public String activity() {
+    System.out.println("Hi");
+    analyticsManager.onActivity();
+    return "";
+  }
 
-    void onStart(@Observes StartupEvent ev) {
-        // Just to trigger the injection of the
-        // analytics manager at start, so that initialization
-        // errors can be thrown at start.
-    }
+  void onStart(@Observes StartupEvent ev) {
+    // Just to trigger the injection of the
+    // analytics manager at start, so that initialization
+    // errors can be thrown at start.
+  }
 
-    void onStop(@Observes ShutdownEvent ev) {
-        analyticsManager.destroy();
-    }
+  void onStop(@Observes ShutdownEvent ev) {
+    analyticsManager.destroy();
+  }
 }
