@@ -233,17 +233,13 @@
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
           </systemProperties>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M4</version>
         <executions>
           <execution>
+            <id>integration-test</id>
             <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
+              <goal>test</goal>
             </goals>
+            <phase>integration-test</phase>
             <configuration>
               <excludes>
                 <exclude>**/Native*IT.java</exclude>
