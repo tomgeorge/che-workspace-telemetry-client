@@ -1,0 +1,66 @@
+metadata:
+  generateName: che-workspace-telemetry-client
+projects:
+  - name: che-workspace-telemetry-client
+    source:
+      location: 'https://github.com/che-incubator/che-workspace-telemetry-client.git'
+      type: git
+      branch: master
+attributes:
+  persistVolumes: 'false'
+components:
+  - id: redhat/java11/latest
+    type: chePlugin
+  - id: che-incubator/typescript/latest
+    type: chePlugin
+  - mountSources: true
+    memoryLimit: 3Gi
+    type: dockerimage
+    volumes:
+      - name: m2
+        containerPath: /home/user/.m2
+    alias: maven-node
+    image: 'quay.io/tgeorge/maven-node:3.6.0-jdk-11-10.19.0'
+    env:
+      - value: ''
+        name: MAVEN_CONFIG
+      - value: >-
+          -XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10
+          -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4
+          -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true
+          -Xms20m -Djava.security.egd=file:/dev/./urandom -Duser.home=/home/user
+        name: MAVEN_OPTS
+      - value: >-
+          -XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10
+          -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4
+          -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true
+          -Xms20m -Djava.security.egd=file:/dev/./urandom
+        name: JAVA_OPTS
+      - value: >-
+          -XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10
+          -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4
+          -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true
+          -Xms20m -Djava.security.egd=file:/dev/./urandom
+        name: JAVA_TOOL_OPTIONS
+apiVersion: 1.0.0
+commands:
+  - name: BUILD all
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/che-workspace-telemetry-client'
+        type: exec
+        command: mvn clean install
+        component: maven-node
+  - name: BUILD backend-base
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/che-workspace-telemetry-client/backend-base'
+        type: exec
+        command: mvn clean package
+        component: maven-node
+  - name: BUILD javascript
+    actions:
+      - workdir: >-
+          ${CHE_PROJECTS_ROOT}/che-workspace-telemetry-client/javascript/src/typescript
+        type: exec
+        command: yarn
+        component: maven-node
+
