@@ -59,7 +59,6 @@ public class TelemetryResource {
     operationId = "activity")
   @APIResponse(responseCode = "200", description = "Notification was successfully submitted")
   public String activity() {
-    System.out.println("Hi");
     analyticsManager.onActivity();
     return "";
   }

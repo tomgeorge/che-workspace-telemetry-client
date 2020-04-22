@@ -11,18 +11,13 @@
  */
 package org.eclipse.che.incubator.workspace.telemetry.base;
 
-import static java.lang.Long.parseLong;
-import static org.eclipse.che.multiuser.machine.authentication.shared.Constants.USER_ID_CLAIM;
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.util.Map;
-
 import com.google.common.annotations.VisibleForTesting;
-
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import org.eclipse.che.api.core.*;
-import org.eclipse.che.api.core.model.factory.Factory;
 import org.eclipse.che.api.core.model.workspace.Workspace;
 import org.eclipse.che.api.core.model.workspace.WorkspaceConfig;
+import org.eclipse.che.api.core.model.workspace.devfile.Component;
 import org.eclipse.che.api.core.model.workspace.devfile.Devfile;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.factory.shared.dto.FactoryDto;
@@ -30,12 +25,15 @@ import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.slf4j.Logger;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.lang.Long.parseLong;
+import static org.eclipse.che.multiuser.machine.authentication.shared.Constants.USER_ID_CLAIM;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public abstract class AbstractAnalyticsManager {
   private static final Logger LOG = getLogger(AbstractAnalyticsManager.class);
@@ -57,6 +55,7 @@ public abstract class AbstractAnalyticsManager {
   @VisibleForTesting final protected String osioSpaceId;
   @VisibleForTesting final protected String sourceTypes;
   @VisibleForTesting final protected String startNumber;
+  @VisibleForTesting final protected List<String> pluginNames;
 
   @VisibleForTesting final protected Long age;
   @VisibleForTesting final protected Long returnDelay;
@@ -75,11 +74,12 @@ public abstract class AbstractAnalyticsManager {
     createdOn = workspace.getAttributes().get(Constants.CREATED_ATTRIBUTE_NAME);
     updatedOn = workspace.getAttributes().get(Constants.UPDATED_ATTRIBUTE_NAME);
     stoppedOn = workspace.getAttributes().get(Constants.STOPPED_ATTRIBUTE_NAME);
-    stoppedAbnormally =
-        workspace.getAttributes().get(Constants.STOPPED_ABNORMALLY_ATTRIBUTE_NAME);
+    stoppedAbnormally = workspace.getAttributes().get(Constants.STOPPED_ABNORMALLY_ATTRIBUTE_NAME);
     lastErrorMessage = workspace.getAttributes().get(Constants.ERROR_MESSAGE_ATTRIBUTE_NAME);
     sourceTypes = workspace.getAttributes().get("sourceTypes");
     startNumber = workspace.getAttributes().get("startNumber");
+
+    pluginNames = getPluginNamesFromWorkspace(workspace);
 
     Long createDate = null;
     Long updateDate = null;
@@ -209,6 +209,16 @@ public abstract class AbstractAnalyticsManager {
         BadRequestException e) {
       throw new RuntimeException("Can't get workspace information for Che analytics", e);
     }
+
+  }
+
+  private List<String> getPluginNamesFromWorkspace(Workspace ws) {
+    List<String> pluginNames = new ArrayList<String>();
+    List<? extends Component> components = ws.getDevfile().getComponents();
+    return components.stream()
+      .filter((e -> e.getType().equals("chePlugin")))
+      .map((e -> e.getId()))
+      .collect(Collectors.toList());
   }
 
   public final String getWorkspaceId() {

@@ -31,6 +31,7 @@ public interface EventProperties {
   public static final String OSIO_SPACE_ID = "osio space id";
   public static final String SOURCE_TYPES = "source types";
   public static final String START_NUMBER = "start number";
-  
+  public static final String PLUGINS = "plugins";
+
   public static final String[] values = {"", ""};
 }
