@@ -8,9 +8,7 @@ package org.eclipse.che.incubator.workspace.telemetry.model;
 
 import java.util.Objects;
 
-import org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent;
 import org.eclipse.che.incubator.workspace.telemetry.base.EventProperties;
-import org.eclipse.microprofile.openapi.annotations.ExternalDocumentation;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Schema(
@@ -76,7 +74,7 @@ public class EventProperty {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class EventProperty {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
