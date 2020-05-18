@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
+import static java.lang.Long.parseLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

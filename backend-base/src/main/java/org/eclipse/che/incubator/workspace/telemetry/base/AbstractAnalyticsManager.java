@@ -41,25 +41,43 @@ public abstract class AbstractAnalyticsManager {
   protected final String workspaceId;
   protected String userId = "";
 
-  @VisibleForTesting final protected String workspaceName;
-  @VisibleForTesting final protected String factoryId;
-  @VisibleForTesting final protected String stackId;
-  @VisibleForTesting final protected String factoryName;
-  @VisibleForTesting final protected String factoryOwner;
-  @VisibleForTesting final protected String factoryUrl;
-  @VisibleForTesting final protected String createdOn;
-  @VisibleForTesting final protected String updatedOn;
-  @VisibleForTesting final protected String stoppedOn;
-  @VisibleForTesting final protected String stoppedAbnormally;
-  @VisibleForTesting final protected String lastErrorMessage;
-  @VisibleForTesting final protected String osioSpaceId;
-  @VisibleForTesting final protected String sourceTypes;
-  @VisibleForTesting final protected String startNumber;
-  @VisibleForTesting final protected List<String> pluginNames;
+  @VisibleForTesting
+  final protected String workspaceName;
+  @VisibleForTesting
+  final protected String factoryId;
+  @VisibleForTesting
+  final protected String stackId;
+  @VisibleForTesting
+  final protected String factoryName;
+  @VisibleForTesting
+  final protected String factoryOwner;
+  @VisibleForTesting
+  final protected String factoryUrl;
+  @VisibleForTesting
+  final protected String createdOn;
+  @VisibleForTesting
+  final protected String updatedOn;
+  @VisibleForTesting
+  final protected String stoppedOn;
+  @VisibleForTesting
+  final protected String stoppedAbnormally;
+  @VisibleForTesting
+  final protected String lastErrorMessage;
+  @VisibleForTesting
+  final protected String osioSpaceId;
+  @VisibleForTesting
+  final protected String sourceTypes;
+  @VisibleForTesting
+  final protected String startNumber;
+  @VisibleForTesting
+  final protected List<String> pluginNames;
 
-  @VisibleForTesting final protected Long age;
-  @VisibleForTesting final protected Long returnDelay;
-  @VisibleForTesting final protected Boolean firstStart;
+  @VisibleForTesting
+  final protected Long age;
+  @VisibleForTesting
+  final protected Long returnDelay;
+  @VisibleForTesting
+  final protected Boolean firstStart;
 
   private HttpJsonRequestFactory requestFactory;
 
@@ -81,37 +99,13 @@ public abstract class AbstractAnalyticsManager {
 
     pluginNames = getPluginNamesFromWorkspace(workspace);
 
-    Long createDate = null;
-    Long updateDate = null;
-    Long stopDate = null;
-    try {
-      createDate = parseLong(createdOn);
-    } catch (NumberFormatException nfe) {
-      LOG.warn("the create timestamp ( " + createdOn + " ) has invalid format", nfe);
-    }
-    try {
-      updateDate = parseLong(updatedOn);
-    } catch (NumberFormatException nfe) {
-      LOG.warn("the update timestamp ( " + updatedOn + " ) has invalid format", nfe);
-    }
-    if (stoppedOn != null) {
-      try {
-        stopDate = parseLong(stoppedOn);
-      } catch (NumberFormatException nfe) {
-        LOG.warn("the stop timestamp ( " + stoppedOn + " ) has invalid format", nfe);
-      }
-    }
+    Long createDate = getDateFromString(createdOn);
+    Long updateDate = getDateFromString(updatedOn);
+    Long stopDate = getDateFromString(stoppedOn);
 
-    if (updateDate != null && createDate != null) {
-      age = (updateDate - createDate) / 1000;
-    } else {
-      age = null;
-    }
-    if (updateDate != null && stopDate != null) {
-      returnDelay = (updateDate - stopDate) / 1000;
-    } else {
-      returnDelay = null;
-    }
+    age = getSecondsBetween(updateDate, createDate);
+    returnDelay = getSecondsBetween(updateDate, stopDate);
+
     if (updateDate != null) {
       firstStart = stopDate == null;
     } else {
@@ -123,6 +117,7 @@ public abstract class AbstractAnalyticsManager {
 
     stackId = workspace.getAttributes().get("stackName");
     factoryId = workspace.getAttributes().get("factoryId");
+//    setFactoryVariables(endpoint, workspaceConfig);
     if (factoryId != null && !"undefined".equals(factoryId)) {
       endpoint = apiEndpoint + "/factory/" + factoryId;
 
@@ -131,8 +126,8 @@ public abstract class AbstractAnalyticsManager {
         factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
       } catch (Exception e) {
         LOG.warn(
-            "Can't get workspace factory ('" + factoryId + "') information for Che analytics",
-            e);
+          "Can't get workspace factory ('" + factoryId + "') information for Che analytics",
+          e);
       }
       if (factory != null) {
         factoryName = factory.getName();
@@ -169,22 +164,122 @@ public abstract class AbstractAnalyticsManager {
     }
     osioSpaceId = workspace.getAttributes().get("osio_spaceId");
 
-    if (workspaceConfig != null) {
-      workspaceName = workspaceConfig.getName();
+    workspaceName = getWorkspaceName(workspaceConfig, devfile);
+    userId = getUserIdFromMachineToken(machineToken);
+  }
+
+  private Workspace getWorkspace(String endpoint) {
+    try {
+      return this.requestFactory.fromUrl(endpoint).request().asDto(WorkspaceDto.class);
+    } catch (IOException |
+      ServerException |
+      UnauthorizedException |
+      ForbiddenException |
+      NotFoundException |
+      ConflictException |
+      BadRequestException e) {
+      throw new RuntimeException("Can't get workspace information for Che analytics", e);
+    }
+
+  }
+
+  private Long getDateFromString(String date) {
+    Long parsedDate = null;
+    try {
+      parsedDate = parseLong(date);
+    } catch (NumberFormatException nfe) {
+      LOG.warn("the timestamp ( " + date + " ) has invalid format", nfe);
+    }
+    return parsedDate;
+  }
+
+  private Long getSecondsBetween(Long end, Long start) {
+    Long timeBetween = null;
+    if (end != null && start != null) {
+      timeBetween = (end - start) / 1000;
+    }
+    return timeBetween;
+  }
+
+  private String getWorkspaceName(WorkspaceConfig config, Devfile devfile) {
+    String workspaceName;
+    if (config != null) {
+      workspaceName = config.getName();
     } else if (devfile != null) {
       workspaceName = devfile.getMetadata().getName();
     } else {
       workspaceName = null;
     }
+    return workspaceName;
+  }
 
-    if (machineToken != null && ! machineToken.isEmpty()) {
+
+  private List<String> getPluginNamesFromWorkspace(Workspace ws) {
+    List<String> pluginNames = new ArrayList<String>();
+    List<? extends Component> components = ws.getDevfile().getComponents();
+    return components.stream()
+      .filter((e -> e.getType().equals("chePlugin")))
+      .map((e -> e.getId()))
+      .collect(Collectors.toList());
+  }
+
+//  private void setFactoryVariables(String endpoint, WorkspaceConfig config) {
+//    if (factoryId != null && !"undefined".equals(factoryId)) {
+//      endpoint = apiEndpoint + "/factory/" + factoryId;
+//
+//      FactoryDto factory = null;
+//      try {
+//        factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
+//      } catch (Exception e) {
+//        LOG.warn(
+//          "Can't get workspace factory ('" + factoryId + "') information for Che analytics",
+//          e);
+//      }
+//      if (factory != null) {
+//        factoryName = factory.getName();
+//        factoryOwner = factory.getCreator().getName();
+//      } else {
+//        factoryName = null;
+//        factoryOwner = null;
+//      }
+//      factoryUrl = null;
+//    } else {
+//      String parametersPrefix = "factory.parameter.";
+//      if (config != null) {
+//        Map<String, String> configAttributes = config.getAttributes();
+//        if (configAttributes.containsKey(parametersPrefix + "name")) {
+//          factoryName = configAttributes.get(parametersPrefix + "name");
+//        } else {
+//          factoryName = null;
+//        }
+//        if (configAttributes.containsKey(parametersPrefix + "user")) {
+//          factoryOwner = configAttributes.get(parametersPrefix + "user");
+//        } else {
+//          factoryOwner = null;
+//        }
+//        if (configAttributes.containsKey(parametersPrefix + "url")) {
+//          factoryUrl = configAttributes.get(parametersPrefix + "url");
+//        } else {
+//          factoryUrl = null;
+//        }
+//      } else {
+//        factoryName = null;
+//        factoryOwner = null;
+//        factoryUrl = null;
+//      }
+//    }
+//  }
+
+  private String getUserIdFromMachineToken(String machineToken) {
+    String userId = this.userId;
+    if (machineToken != null && !machineToken.isEmpty()) {
       try {
-      JwtParser jwtParser = Jwts.parser();
+        JwtParser jwtParser = Jwts.parser();
         String[] splitted = machineToken.split("\\.");
         if (splitted.length != 3) {
           LOG.warn("Cannot retrieve user Id from the machine token: invalid token");
         } else {
-          Object userIdClaim = jwtParser.parseClaimsJwt(splitted[0]+ "." + splitted[1] + ".").getBody().get(USER_ID_CLAIM);
+          Object userIdClaim = jwtParser.parseClaimsJwt(splitted[0] + "." + splitted[1] + ".").getBody().get(USER_ID_CLAIM);
           if (userIdClaim == null) {
             LOG.warn("Cannot retrieve user Id from the machine token: No '{}' claim", USER_ID_CLAIM);
           } else {
@@ -195,30 +290,7 @@ public abstract class AbstractAnalyticsManager {
         LOG.warn("Cannot retrieve user Id from the machine token", e);
       }
     }
-  }
-
-  private Workspace getWorkspace(String endpoint) {
-    try {
-      return this.requestFactory.fromUrl(endpoint).request().asDto(WorkspaceDto.class);
-    } catch (IOException |
-        ServerException |
-        UnauthorizedException |
-        ForbiddenException |
-        NotFoundException |
-        ConflictException |
-        BadRequestException e) {
-      throw new RuntimeException("Can't get workspace information for Che analytics", e);
-    }
-
-  }
-
-  private List<String> getPluginNamesFromWorkspace(Workspace ws) {
-    List<String> pluginNames = new ArrayList<String>();
-    List<? extends Component> components = ws.getDevfile().getComponents();
-    return components.stream()
-      .filter((e -> e.getType().equals("chePlugin")))
-      .map((e -> e.getId()))
-      .collect(Collectors.toList());
+    return userId;
   }
 
   public final String getWorkspaceId() {
