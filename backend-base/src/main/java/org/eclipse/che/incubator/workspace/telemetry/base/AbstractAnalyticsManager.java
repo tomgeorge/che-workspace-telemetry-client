@@ -12,40 +12,20 @@
 package org.eclipse.che.incubator.workspace.telemetry.base;
 
 import static java.lang.Long.parseLong;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent.WORKSPACE_OPENED;
 import static org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent.WORKSPACE_STARTED;
-import static org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent.WORKSPACE_INACTIVE;
-import static org.eclipse.che.incubator.workspace.telemetry.base.AnalyticsEvent.WORKSPACE_USED;
 import static org.eclipse.che.multiuser.machine.authentication.shared.Constants.USER_ID_CLAIM;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.hash.Hashing;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.eclipse.che.api.core.BadRequestException;
 import org.eclipse.che.api.core.ConflictException;
@@ -127,12 +107,6 @@ public abstract class AbstractAnalyticsManager {
 
   private HttpJsonRequestFactory requestFactory;
 
-  @VisibleForTesting
-  LoadingCache<String, EventDispatcher> dispatchers;
-
-  protected ScheduledExecutorService checkActivityExecutor = Executors
-      .newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Analytics Activity Checker").build());
-
   public AbstractAnalyticsManager(String apiEndpoint, String workspaceId, String machineToken,
       HttpJsonRequestFactory requestFactory) {
     this.workspaceId = workspaceId;
@@ -149,12 +123,9 @@ public abstract class AbstractAnalyticsManager {
     lastErrorMessage = workspace.getAttributes().get(Constants.ERROR_MESSAGE_ATTRIBUTE_NAME);
     sourceTypes = workspace.getAttributes().get("sourceTypes");
     startNumber = workspace.getAttributes().get("startNumber");
-    LOG.info(workspace.toString());
-    LOG.info(workspace.getDevfile().toString());
 
     pluginNames = getPluginNamesFromWorkspace(workspace);
 
-    LOG.info("createdOn is " + createdOn);
     Long createDate = getDateFromString(createdOn);
     Long updateDate = getDateFromString(updatedOn);
     Long stopDate = getDateFromString(stoppedOn);
@@ -178,58 +149,7 @@ public abstract class AbstractAnalyticsManager {
 
     workspaceName = getWorkspaceName(workspaceConfig, devfile);
     userId = getUserIdFromMachineToken(machineToken);
-
-    long checkActivityPeriod = pingTimeoutSeconds / 2;
-
-    checkActivityExecutor.scheduleAtFixedRate(this::checkActivity, checkActivityPeriod, checkActivityPeriod, SECONDS);
-
-    dispatchers = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10)
-        .removalListener((RemovalNotification<String, EventDispatcher> n) -> {
-          EventDispatcher dispatcher = n.getValue();
-          if (dispatcher != null) {
-            dispatcher.close();
-          }
-        }).build(CacheLoader.<String, EventDispatcher>from(userId -> newEventDispatcher(userId)));
-
   }
-
-  private void checkActivity() {
-    LOG.debug("In checkActivity");
-    long inactiveLimit = System.currentTimeMillis() - noActivityTimeout;
-    dispatchers.asMap().values().forEach(dispatcher -> {
-      LOG.debug("Checking activity of dispatcher for user: {}", dispatcher.getUserId());
-      if (dispatcher.getLastActivityTime() < inactiveLimit) {
-        LOG.debug("Sending 'WORKSPACE_INACTIVE' event for user: {}", dispatcher.getUserId());
-        if (dispatcher.sendTrackEvent(WORKSPACE_INACTIVE, getCommonProperties(), dispatcher.getLastIp(),
-            dispatcher.getLastUserAgent(), dispatcher.getLastResolution()) != null) {
-          LOG.debug("Sent 'WORKSPACE_INACTIVE' event for user: {}", dispatcher.getUserId());
-          return;
-        }
-        LOG.debug(
-            "Skipped sending 'WORKSPACE_INACTIVE' event for user: {} since it is the same event as the previous one",
-            dispatcher.getUserId());
-        return;
-      }
-      synchronized (dispatcher) {
-        AnalyticsEvent lastEvent = dispatcher.getLastEvent();
-        if (lastEvent == null) {
-          return;
-        }
-
-        long expectedDuration = lastEvent.getExpectedDurationSeconds() * 1000;
-        if (lastEvent == WORKSPACE_INACTIVE || (expectedDuration >= 0
-            && System.currentTimeMillis() > expectedDuration + dispatcher.getLastEventTime())) {
-          dispatcher.sendTrackEvent(WORKSPACE_USED, getCommonProperties(), dispatcher.getLastIp(),
-              dispatcher.getLastUserAgent(), dispatcher.getLastResolution());
-        }
-      }
-    });
-  }
-
-  EventDispatcher newEventDispatcher(String userId) {
-    return new EventDispatcher(userId, this);
-  }
-
 
   private Workspace getWorkspace(String endpoint) {
     try {
@@ -360,7 +280,6 @@ public abstract class AbstractAnalyticsManager {
   }
 
   public final String getUserId() {
-
     return userId;
   }
 
@@ -393,7 +312,6 @@ public abstract class AbstractAnalyticsManager {
    *         met, the same event otherwise.
    */
   public AnalyticsEvent transformEvent(AnalyticsEvent event, String userId) {
-    LOG.info("transformEvent userId=[" + userId +"]");
     if (event == WORKSPACE_OPENED && workspaceStartingUserId == null) {
       event = AnalyticsEvent.WORKSPACE_STARTED;
     }
@@ -449,153 +367,5 @@ public abstract class AbstractAnalyticsManager {
 
   public Map<String, Object> getCommonProperties() {
     return commonProperties;
-  }
-
-  @VisibleForTesting
-  class EventDispatcher {
-
-    @VisibleForTesting
-    String userId;
-    @VisibleForTesting
-    String cookie;
-
-    private AnalyticsEvent lastEvent = null;
-    @VisibleForTesting
-    Map<String, Object> lastEventProperties = null;
-    private long lastActivityTime;
-    private long lastEventTime;
-    private String lastIp = null;
-    private String lastUserAgent = null;
-    private String lastResolution = null;
-    private ScheduledFuture<?> pinger = null;
-
-    EventDispatcher(String userId, AbstractAnalyticsManager manager) {
-      this.userId = userId;
-      cookie = Hashing.sha256().hashString(workspaceId + userId + System.currentTimeMillis(), StandardCharsets.UTF_8)
-          .toString();
-      LOG.info("Analytics Woopra Cookie for user {} and workspace {} : {}", userId, workspaceId, cookie);
-    }
-
-    void onActivity() {
-      lastActivityTime = System.currentTimeMillis();
-    }
-
-    private boolean areEventsEqual(AnalyticsEvent event, Map<String, Object> properties) {
-      if (lastEvent == null || lastEvent != event) {
-        return false;
-      }
-
-      if (lastEventProperties == null) {
-        return false;
-      }
-
-      for (String propToCheck : event.getPropertiesToCheck()) {
-        Object lastValue = lastEventProperties.get(propToCheck);
-        Object newValue = properties.get(propToCheck);
-        if (lastValue != null && newValue != null && lastValue.equals(newValue)) {
-          continue;
-        }
-        if (lastValue == null && newValue == null) {
-          continue;
-        }
-        return false;
-      }
-
-      return true;
-    }
-
-    String sendTrackEvent(AnalyticsEvent event, final Map<String, Object> properties, String ip, String userAgent,
-        String resolution) {
-      return sendTrackEvent(event, properties, ip, userAgent, resolution, false);
-    }
-
-    String sendTrackEvent(AnalyticsEvent event, final Map<String, Object> properties, String ip, String userAgent,
-        String resolution, boolean force) {
-      String eventId;
-      lastIp = ip;
-      lastUserAgent = userAgent;
-      lastResolution = resolution;
-      final String theIp = ip != null ? ip : "0.0.0.0";
-      synchronized (this) {
-        lastEventTime = System.currentTimeMillis();
-        if (!force && areEventsEqual(event, properties)) {
-          LOG.debug("Skipping event " + event.toString() + " since it is the same as the last one");
-          return null;
-        }
-
-        eventId = UUID.randomUUID().toString();
-        TrackMessage.Builder messageBuilder = TrackMessage.builder(event.toString()).userId(userId).messageId(eventId);
-
-        ImmutableMap.Builder<String, Object> integrationBuilder = ImmutableMap.<String, Object>builder()
-            .put("cookie", cookie).put("timeout", pingTimeout);
-        messageBuilder.integrationOptions("Woopra", integrationBuilder.build());
-
-        ImmutableMap.Builder<String, Object> propertiesBuilder = ImmutableMap.<String, Object>builder()
-            .putAll(properties);
-        messageBuilder.properties(propertiesBuilder.build());
-
-        ImmutableMap.Builder<String, Object> contextBuilder = ImmutableMap.<String, Object>builder().put("ip", ip);
-        if (userAgent != null) {
-          contextBuilder.put("userAgent", userAgent);
-        }
-        if (event.getExpectedDurationSeconds() == 0) {
-          contextBuilder.put("duration", 0);
-        }
-        messageBuilder.context(contextBuilder.build());
-
-        LOG.debug("sending " + event.toString() + " (ip=" + theIp + " - userAgent=" + userAgent + ") with properties: "
-            + properties);
-        analytics.enqueue(messageBuilder);
-
-        lastEvent = event;
-        lastEventProperties = properties;
-
-        long pingPeriod = pingTimeoutSeconds / 3 + 2;
-
-        if (pinger != null) {
-          pinger.cancel(true);
-        }
-
-        LOG.debug("scheduling ping request with the following delay: " + pingPeriod);
-        pinger = networkExecutor.scheduleAtFixedRate(() -> sendPingRequest(false), pingPeriod, pingPeriod,
-            TimeUnit.SECONDS);
-      }
-      return eventId;
-    }
-
-    long getLastActivityTime() {
-      return lastActivityTime;
-    }
-
-    String getLastIp() {
-      return lastIp;
-    }
-
-    String getLastUserAgent() {
-      return lastUserAgent;
-    }
-
-    String getLastResolution() {
-      return lastResolution;
-    }
-
-    String getUserId() {
-      return userId;
-    }
-
-    AnalyticsEvent getLastEvent() {
-      return lastEvent;
-    }
-
-    long getLastEventTime() {
-      return lastEventTime;
-    }
-
-    void close() {
-      if (pinger != null) {
-        pinger.cancel(true);
-      }
-      pinger = null;
-    }
   }
 }

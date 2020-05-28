@@ -52,7 +52,6 @@ public class TelemetryResource {
     return "";
   }
 
-
   @POST
   @Path("/activity")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -63,7 +62,6 @@ public class TelemetryResource {
   @APIResponse(responseCode = "200", description = "Notification was successfully submitted")
   public String activity() {
     analyticsManager.onActivity();
-
     return "";
   }
 
