@@ -46,9 +46,10 @@ public class TelemetryResource {
         .collect(Collectors.toMap(e -> e.getId(), e -> e.getValue()));
 
     AnalyticsEvent analyticsEvent = analyticsManager.transformEvent(AnalyticsEvent.valueOf(event.getId()), analyticsManager.getUserId());
+    analyticsManager.setEventProperties(params);
     analyticsManager.setCommonProperties(analyticsManager.transformProperties(params));
     analyticsManager.onActivity();
-    analyticsManager.onEvent(analyticsEvent, event.getOwnerId(), event.getIp(), event.getAgent(), event.getResolution(), analyticsManager.getCommonProperties());
+    analyticsManager.onEvent(analyticsEvent, event.getOwnerId(), event.getIp(), event.getAgent(), event.getResolution(), analyticsManager.getCurrentEventProperties());
     return "";
   }
 

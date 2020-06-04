@@ -100,12 +100,23 @@ public abstract class AbstractAnalyticsManager {
   protected Map<String, Object> commonProperties;
 
   @VisibleForTesting
+  protected Map<String, Object> eventProperties;
+
+  @VisibleForTesting
   protected static long pingTimeoutSeconds = 30;
 
   @VisibleForTesting
   protected static long pingTimeout = pingTimeoutSeconds * 1000;
 
   private HttpJsonRequestFactory requestFactory;
+
+  public abstract boolean isEnabled();
+
+  public abstract void onActivity();
+
+  public abstract void onEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution, Map<String, Object> properties);
+
+  public abstract void destroy();
 
   public AbstractAnalyticsManager(String apiEndpoint, String workspaceId, String machineToken,
       HttpJsonRequestFactory requestFactory) {
@@ -149,130 +160,7 @@ public abstract class AbstractAnalyticsManager {
 
     workspaceName = getWorkspaceName(workspaceConfig, devfile);
     userId = getUserIdFromMachineToken(machineToken);
-  }
-
-  private Workspace getWorkspace(String endpoint) {
-    try {
-      return this.requestFactory.fromUrl(endpoint).request().asDto(WorkspaceDto.class);
-    } catch (IOException |
-      ServerException |
-      UnauthorizedException |
-      ForbiddenException |
-      NotFoundException |
-      ConflictException |
-      BadRequestException e) {
-      throw new RuntimeException("Can't get workspace information for Che analytics", e);
-    }
-
-  }
-
-  private Long getDateFromString(String date) {
-    Long parsedDate = null;
-    try {
-      parsedDate = parseLong(date);
-    } catch (NumberFormatException nfe) {
-      LOG.warn("the timestamp ( " + date + " ) has invalid format", nfe);
-    }
-    return parsedDate;
-  }
-
-  private Long getSecondsBetween(Long end, Long start) {
-    Long timeBetween = null;
-    if (end != null && start != null) {
-      timeBetween = (end - start) / 1000;
-    }
-    return timeBetween;
-  }
-
-  private String getWorkspaceName(WorkspaceConfig config, Devfile devfile) {
-    String workspaceName;
-    if (config != null) {
-      workspaceName = config.getName();
-    } else if (devfile != null) {
-      workspaceName = devfile.getMetadata().getName();
-    } else {
-      workspaceName = null;
-    }
-    return workspaceName;
-  }
-
-
-  private List<String> getPluginNamesFromWorkspace(Workspace ws) {
-    List<? extends Component> components = ws.getDevfile().getComponents();
-    return components.stream()
-      .filter((e -> e.getType().equals("chePlugin")))
-      .map((e -> e.getId()))
-      .collect(Collectors.toList());
-  }
-
- private void setFactoryVariables(String apiEndpoint, WorkspaceConfig config) {
-   if (factoryId != null && !"undefined".equals(factoryId)) {
-     String endpoint = apiEndpoint + "/factory/" + factoryId;
-
-     FactoryDto factory = null;
-     try {
-       factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
-     } catch (Exception e) {
-       LOG.warn(
-         "Can't get workspace factory ('" + factoryId + "') information for Che analytics",
-         e);
-     }
-     if (factory != null) {
-       factoryName = factory.getName();
-      factoryOwner = factory.getCreator().getName();
-     } else {
-       factoryName = null;
-       factoryOwner = null;
-     }
-     factoryUrl = null;
-   } else {
-     String parametersPrefix = "factory.parameter.";
-     if (config != null) {
-       Map<String, String> configAttributes = config.getAttributes();
-       if (configAttributes.containsKey(parametersPrefix + "name")) {
-         factoryName = configAttributes.get(parametersPrefix + "name");
-       } else {
-         factoryName = null;
-       }
-       if (configAttributes.containsKey(parametersPrefix + "user")) {
-         factoryOwner = configAttributes.get(parametersPrefix + "user");
-       } else {
-         factoryOwner = null;
-       }
-       if (configAttributes.containsKey(parametersPrefix + "url")) {
-         factoryUrl = configAttributes.get(parametersPrefix + "url");
-       } else {
-         factoryUrl = null;
-       }
-     } else {
-       factoryName = null;
-       factoryOwner = null;
-       factoryUrl = null;
-     }
-   }
- }
-
-  private String getUserIdFromMachineToken(String machineToken) {
-    String userId = this.userId;
-    if (machineToken != null && !machineToken.isEmpty()) {
-      try {
-        JwtParser jwtParser = Jwts.parser();
-        String[] splitted = machineToken.split("\\.");
-        if (splitted.length != 3) {
-          LOG.warn("Cannot retrieve user Id from the machine token: invalid token");
-        } else {
-          Object userIdClaim = jwtParser.parseClaimsJwt(splitted[0] + "." + splitted[1] + ".").getBody().get(USER_ID_CLAIM);
-          if (userIdClaim == null) {
-            LOG.warn("Cannot retrieve user Id from the machine token: No '{}' claim", USER_ID_CLAIM);
-          } else {
-            userId = userIdClaim.toString();
-          }
-        }
-      } catch (Exception e) {
-        LOG.warn("Cannot retrieve user Id from the machine token", e);
-      }
-    }
-    return userId;
+    commonProperties = makeCommonProperties();
   }
 
   public final String getWorkspaceId() {
@@ -280,25 +168,13 @@ public abstract class AbstractAnalyticsManager {
   }
 
   public final String getUserId() {
+
     return userId;
   }
 
   public final List<String> getPluginNames() {
     return pluginNames;
   }
-
-  private String makePluginString(List<String> pluginNames) {
-    return pluginNames.stream().collect(Collectors.joining(", "));
-  }
-
-  public abstract boolean isEnabled();
-
-  public abstract void onActivity();
-
-  public abstract void onEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution,
-      Map<String, Object> properties);
-
-  public abstract void destroy();
 
   /**
    * transformEvent performs preliminary modification to the event passed to
@@ -355,9 +231,6 @@ public abstract class AbstractAnalyticsManager {
           }
 
         });
-    properties.forEach((k, v)-> {
-      commonPropertiesBuilder.put(k, v);
-    });
     return commonPropertiesBuilder.build();
   }
 
@@ -368,4 +241,174 @@ public abstract class AbstractAnalyticsManager {
   public Map<String, Object> getCommonProperties() {
     return commonProperties;
   }
+
+  public void setEventProperties(Map<String, Object> eventProperties) {
+    this.eventProperties = eventProperties;
+  }
+
+  private Workspace getWorkspace(String endpoint) {
+    try {
+      return this.requestFactory.fromUrl(endpoint).request().asDto(WorkspaceDto.class);
+    } catch (IOException | ServerException | UnauthorizedException | ForbiddenException | NotFoundException | ConflictException | BadRequestException e) {
+      throw new RuntimeException("Can't get workspace information for Che analytics", e);
+    }
+
+  }
+
+  private Long getDateFromString(String date) {
+    Long parsedDate = null;
+    try {
+      parsedDate = parseLong(date);
+    } catch (NumberFormatException nfe) {
+      LOG.warn("the timestamp ( " + date + " ) has invalid format", nfe);
+    }
+    return parsedDate;
+  }
+
+  private Long getSecondsBetween(Long end, Long start) {
+    Long timeBetween = null;
+    if (end != null && start != null) {
+      timeBetween = (end - start) / 1000;
+    }
+    return timeBetween;
+  }
+
+  private String getWorkspaceName(WorkspaceConfig config, Devfile devfile) {
+    String workspaceName;
+    if (config != null) {
+      workspaceName = config.getName();
+    } else if (devfile != null) {
+      workspaceName = devfile.getMetadata().getName();
+    } else {
+      workspaceName = null;
+    }
+    return workspaceName;
+  }
+
+  private List<String> getPluginNamesFromWorkspace(Workspace ws) {
+    List<? extends Component> components = ws.getDevfile().getComponents();
+    return components.stream()
+      .filter((e -> e.getType().equals("chePlugin")))
+      .map((e -> e.getId()))
+      .collect(Collectors.toList());
+  }
+
+  private void setFactoryVariables(String apiEndpoint, WorkspaceConfig config) {
+    if (factoryId != null && !"undefined".equals(factoryId)) {
+      String endpoint = apiEndpoint + "/factory/" + factoryId;
+
+      FactoryDto factory = null;
+      try {
+        factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
+      } catch (Exception e) {
+        LOG.warn("Can't get workspace factory ('" + factoryId + "') information for Che analytics", e);
+      }
+      if (factory != null) {
+        factoryName = factory.getName();
+        factoryOwner = factory.getCreator().getName();
+      } else {
+        factoryName = null;
+        factoryOwner = null;
+      }
+      factoryUrl = null;
+    } else {
+      String parametersPrefix = "factory.parameter.";
+      if (config != null) {
+        Map<String, String> configAttributes = config.getAttributes();
+        if (configAttributes.containsKey(parametersPrefix + "name")) {
+          factoryName = configAttributes.get(parametersPrefix + "name");
+        } else {
+          factoryName = null;
+        }
+        if (configAttributes.containsKey(parametersPrefix + "user")) {
+          factoryOwner = configAttributes.get(parametersPrefix + "user");
+        } else {
+          factoryOwner = null;
+        }
+        if (configAttributes.containsKey(parametersPrefix + "url")) {
+          factoryUrl = configAttributes.get(parametersPrefix + "url");
+        } else {
+          factoryUrl = null;
+        }
+      } else {
+        factoryName = null;
+        factoryOwner = null;
+        factoryUrl = null;
+      }
+    }
+  }
+
+  private String getUserIdFromMachineToken(String machineToken) {
+    String userId = this.userId;
+    if (machineToken != null && !machineToken.isEmpty()) {
+      try {
+        JwtParser jwtParser = Jwts.parser();
+        String[] splitted = machineToken.split("\\.");
+        if (splitted.length != 3) {
+          LOG.warn("Cannot retrieve user Id from the machine token: invalid token");
+        } else {
+          Object userIdClaim = jwtParser.parseClaimsJwt(splitted[0] + "." + splitted[1] + ".").getBody()
+              .get(USER_ID_CLAIM);
+          if (userIdClaim == null) {
+            LOG.warn("Cannot retrieve user Id from the machine token: No '{}' claim", USER_ID_CLAIM);
+          } else {
+            userId = userIdClaim.toString();
+          }
+        }
+      } catch (Exception e) {
+        LOG.warn("Cannot retrieve user Id from the machine token", e);
+      }
+    }
+    return userId;
+  }
+
+  /**
+   * create a map of the common and current event properties merged together
+   * @return a map of the current event and common workspace properties
+   */
+  public Map<String, Object> getCurrentEventProperties() {
+    ImmutableMap.Builder<String, Object> currentEventPropertiesBuilder = ImmutableMap.builder();
+    commonProperties.forEach((k, v) -> {
+      currentEventPropertiesBuilder.put(k, v);
+    });
+    eventProperties.forEach((k, v) -> {
+      currentEventPropertiesBuilder.put(k, v);
+    });
+    return currentEventPropertiesBuilder.build();
+  }
+
+  private Map<String, Object> makeCommonProperties() {
+    ImmutableMap.Builder<String, Object> commonPropertiesBuilder = ImmutableMap.builder();
+
+    Arrays.asList(new SimpleImmutableEntry<>(EventProperties.CREATED, createdOn),
+        new SimpleImmutableEntry<>(EventProperties.WORKSPACE_ID, workspaceId),
+        new SimpleImmutableEntry<>(EventProperties.WORKSPACE_NAME, workspaceName),
+        new SimpleImmutableEntry<>(EventProperties.UPDATED, updatedOn),
+        new SimpleImmutableEntry<>(EventProperties.STOPPED, stoppedOn),
+        new SimpleImmutableEntry<>(EventProperties.AGE, age),
+        new SimpleImmutableEntry<>(EventProperties.RETURN_DELAY, returnDelay),
+        new SimpleImmutableEntry<>(EventProperties.FIRST_START, firstStart),
+        new SimpleImmutableEntry<>(EventProperties.STACK_ID, stackId),
+        new SimpleImmutableEntry<>(EventProperties.FACTORY_ID, factoryId),
+        new SimpleImmutableEntry<>(EventProperties.FACTORY_NAME, factoryName),
+        new SimpleImmutableEntry<>(EventProperties.FACTORY_URL, factoryUrl),
+        new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner),
+        new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILED, stoppedAbnormally),
+        new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILURE, lastErrorMessage),
+        new SimpleImmutableEntry<>(EventProperties.OSIO_SPACE_ID, osioSpaceId),
+        new SimpleImmutableEntry<>(EventProperties.SOURCE_TYPES, sourceTypes),
+        new SimpleImmutableEntry<>(EventProperties.START_NUMBER, startNumber),
+        new SimpleImmutableEntry<>(EventProperties.PLUGINS, makePluginString(pluginNames))).forEach((entry) -> {
+          if (entry.getValue() != null) {
+            commonPropertiesBuilder.put(entry.getKey(), entry.getValue());
+          }
+
+        });
+    return commonPropertiesBuilder.build();
+  }
+
+  private String makePluginString(List<String> pluginNames) {
+    return pluginNames.stream().collect(Collectors.joining(", "));
+  }
+
 }
