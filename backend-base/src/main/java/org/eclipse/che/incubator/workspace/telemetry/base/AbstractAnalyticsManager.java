@@ -41,6 +41,7 @@ import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.factory.shared.dto.FactoryDto;
 import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 
 import io.jsonwebtoken.JwtParser;
@@ -105,13 +106,31 @@ public abstract class AbstractAnalyticsManager {
   @VisibleForTesting
   protected static long pingTimeout = pingTimeoutSeconds * 1000;
 
+  protected AnalyticsEvent lastEvent = null;
+
+  @VisibleForTesting
+  Map<String, Object> lastEventProperties = null;
+
+  protected long lastActivityTime;
+
+  protected long lastEventTime;
+
+  protected String lastIp = null;
+
+  protected String lastUserAgent = null;
+
+  protected String lastResolution = null;
+
+  protected long debounceTimeMillis = 1500;
+
   private HttpJsonRequestFactory requestFactory;
 
   public abstract boolean isEnabled();
 
   public abstract void onActivity();
 
-  public abstract void onEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution, Map<String, Object> properties);
+  public abstract void onEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution,
+      Map<String, Object> properties);
 
   public abstract void destroy();
 
@@ -126,7 +145,7 @@ public abstract class AbstractAnalyticsManager {
 
     createdOn = workspace.getAttributes().get(Constants.CREATED_ATTRIBUTE_NAME);
     updatedOn = workspace.getAttributes().get(Constants.UPDATED_ATTRIBUTE_NAME);
-    stoppedOn = workspace.getAttributes().get(Constants.STOPPED_ATTRIBUTE_NAME);
+    stoppedOn = workspace.getAttributes().get(  Constants.STOPPED_ATTRIBUTE_NAME);
     stoppedAbnormally = workspace.getAttributes().get(Constants.STOPPED_ABNORMALLY_ATTRIBUTE_NAME);
     lastErrorMessage = workspace.getAttributes().get(Constants.ERROR_MESSAGE_ATTRIBUTE_NAME);
     sourceTypes = workspace.getAttributes().get("sourceTypes");
@@ -160,8 +179,13 @@ public abstract class AbstractAnalyticsManager {
     commonProperties = makeCommonProperties();
   }
 
-  public void doSendEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution, Map<String, Object> properties) {
-    onEvent(event, ownerId, ip, userAgent, resolution, getCurrentEventProperties(properties));
+  public void doSendEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution,
+      Map<String, Object> properties) {
+    if (shouldSendEvent(event, properties)) {
+      onEvent(event, ownerId, ip, userAgent, resolution, getCurrentEventProperties(properties));
+    } else {
+      return;
+    }
   }
 
   public final String getWorkspaceId() {
@@ -248,7 +272,8 @@ public abstract class AbstractAnalyticsManager {
   private Workspace getWorkspace(String endpoint) {
     try {
       return this.requestFactory.fromUrl(endpoint).request().asDto(WorkspaceDto.class);
-    } catch (IOException | ServerException | UnauthorizedException | ForbiddenException | NotFoundException | ConflictException | BadRequestException e) {
+    } catch (IOException | ServerException | UnauthorizedException | ForbiddenException | NotFoundException
+        | ConflictException | BadRequestException e) {
       throw new RuntimeException("Can't get workspace information for Che analytics", e);
     }
 
@@ -286,10 +311,8 @@ public abstract class AbstractAnalyticsManager {
 
   private List<String> getPluginNamesFromWorkspace(Workspace ws) {
     List<? extends Component> components = ws.getDevfile().getComponents();
-    return components.stream()
-      .filter((e -> e.getType().equals("chePlugin")))
-      .map((e -> e.getId()))
-      .collect(Collectors.toList());
+    return components.stream().filter((e -> e.getType().equals("chePlugin"))).map((e -> e.getId()))
+        .collect(Collectors.toList());
   }
 
   private void setFactoryVariables(String apiEndpoint, WorkspaceConfig config) {
@@ -363,6 +386,7 @@ public abstract class AbstractAnalyticsManager {
 
   /**
    * create a map of the common and current event properties merged together
+   *
    * @return a map of the current event and common workspace properties
    */
   public Map<String, Object> getCurrentEventProperties(Map<String, Object> eventProperties) {
@@ -408,6 +432,43 @@ public abstract class AbstractAnalyticsManager {
 
   private String makePluginString(List<String> pluginNames) {
     return pluginNames.stream().collect(Collectors.joining(", "));
+  }
+
+  private boolean shouldSendEvent(AnalyticsEvent event, Map<String, Object> properties) {
+    long eventTime = System.currentTimeMillis();
+    if (lastEventTime != 0
+        && (sameAsLastEvent(event, properties) && insideDebounceTime(eventTime, lastEventTime, debounceTimeMillis))) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  private boolean sameAsLastEvent(AnalyticsEvent event, Map<String, Object> properties) {
+    if (lastEvent == null || lastEvent != event) {
+      return false;
+    }
+
+    if (lastEventProperties == null) {
+      return false;
+    }
+
+    for (String property: event.getPropertiesToCheck()) {
+      Object lastValue = lastEventProperties.get(property);
+      Object newValue = properties.get(property);
+      if (lastValue != null && newValue != null && lastValue.equals(newValue)) {
+        continue;
+      }
+      if (lastValue == null && newValue == null) {
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
+
+  private boolean insideDebounceTime(long eventTime, long lastEventTime, long debounceTimeMillis) {
+    return (eventTime - lastEventTime) < debounceTimeMillis;
   }
 
 }

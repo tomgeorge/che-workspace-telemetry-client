@@ -42,6 +42,12 @@ public class DefaultAnalyticsManager extends AbstractAnalyticsManager {
   public void onEvent(AnalyticsEvent event, String ownerId, String ip,
       String userAgent, String resolution, Map<String, Object> properties) {
     LOG.info("Event triggered by user {} in {} from ip {} on agent {} :\n{}\nwith resolution: {}\nwith properties:\n{}", getUserId(), ownerId, ip, userAgent, event, resolution, properties);
+    lastEvent = event;
+    lastEventTime = System.currentTimeMillis();
+    lastIp = ip;
+    lastUserAgent = userAgent;
+    lastResolution = resolution;
+    lastEventProperties = properties;
   }
 
   @Override
