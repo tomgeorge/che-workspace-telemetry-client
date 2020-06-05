@@ -100,9 +100,6 @@ public abstract class AbstractAnalyticsManager {
   protected Map<String, Object> commonProperties;
 
   @VisibleForTesting
-  protected Map<String, Object> eventProperties;
-
-  @VisibleForTesting
   protected static long pingTimeoutSeconds = 30;
 
   @VisibleForTesting
@@ -163,6 +160,10 @@ public abstract class AbstractAnalyticsManager {
     commonProperties = makeCommonProperties();
   }
 
+  public void doSendEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution, Map<String, Object> properties) {
+    onEvent(event, ownerId, ip, userAgent, resolution, getCurrentEventProperties(properties));
+  }
+
   public final String getWorkspaceId() {
     return workspaceId;
   }
@@ -188,7 +189,9 @@ public abstract class AbstractAnalyticsManager {
    *         met, the same event otherwise.
    */
   public AnalyticsEvent transformEvent(AnalyticsEvent event, String userId) {
+    LOG.info("transformEvent " + userId);
     if (event == WORKSPACE_OPENED && workspaceStartingUserId == null) {
+      LOG.info("setting userid to null");
       event = AnalyticsEvent.WORKSPACE_STARTED;
     }
     if (event == WORKSPACE_STARTED) {
@@ -240,10 +243,6 @@ public abstract class AbstractAnalyticsManager {
 
   public Map<String, Object> getCommonProperties() {
     return commonProperties;
-  }
-
-  public void setEventProperties(Map<String, Object> eventProperties) {
-    this.eventProperties = eventProperties;
   }
 
   private Workspace getWorkspace(String endpoint) {
@@ -366,7 +365,7 @@ public abstract class AbstractAnalyticsManager {
    * create a map of the common and current event properties merged together
    * @return a map of the current event and common workspace properties
    */
-  public Map<String, Object> getCurrentEventProperties() {
+  public Map<String, Object> getCurrentEventProperties(Map<String, Object> eventProperties) {
     ImmutableMap.Builder<String, Object> currentEventPropertiesBuilder = ImmutableMap.builder();
     commonProperties.forEach((k, v) -> {
       currentEventPropertiesBuilder.put(k, v);
