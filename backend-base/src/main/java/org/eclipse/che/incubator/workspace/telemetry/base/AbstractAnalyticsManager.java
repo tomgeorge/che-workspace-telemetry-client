@@ -218,9 +218,7 @@ public abstract class AbstractAnalyticsManager {
    *         met, the same event otherwise.
    */
   public AnalyticsEvent transformEvent(AnalyticsEvent event, String userId) {
-    LOG.info("transformEvent " + userId);
     if (event == WORKSPACE_OPENED && workspaceStartingUserId == null) {
-      LOG.info("setting userid to null");
       event = AnalyticsEvent.WORKSPACE_STARTED;
     }
     if (event == WORKSPACE_STARTED) {
