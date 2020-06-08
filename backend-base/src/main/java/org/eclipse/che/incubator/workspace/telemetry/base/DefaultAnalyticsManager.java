@@ -51,6 +51,9 @@ public class DefaultAnalyticsManager extends AbstractAnalyticsManager {
   }
 
   @Override
+  public void increaseDuration(AnalyticsEvent event, Map<String, Object> properties) {}
+
+  @Override
   public void destroy() {
     LOG.info("Destroying the Analytics manager");
   }

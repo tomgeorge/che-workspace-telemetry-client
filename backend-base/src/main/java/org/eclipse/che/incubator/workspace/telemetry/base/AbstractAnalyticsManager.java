@@ -41,7 +41,6 @@ import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.factory.shared.dto.FactoryDto;
 import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 
 import io.jsonwebtoken.JwtParser;
@@ -132,6 +131,8 @@ public abstract class AbstractAnalyticsManager {
   public abstract void onEvent(AnalyticsEvent event, String ownerId, String ip, String userAgent, String resolution,
       Map<String, Object> properties);
 
+  public abstract void increaseDuration(AnalyticsEvent event, Map<String, Object> properties);
+
   public abstract void destroy();
 
   public AbstractAnalyticsManager(String apiEndpoint, String workspaceId, String machineToken,
@@ -184,6 +185,7 @@ public abstract class AbstractAnalyticsManager {
     if (shouldSendEvent(event, properties)) {
       onEvent(event, ownerId, ip, userAgent, resolution, getCurrentEventProperties(properties));
     } else {
+      increaseDuration(event, properties);
       return;
     }
   }
