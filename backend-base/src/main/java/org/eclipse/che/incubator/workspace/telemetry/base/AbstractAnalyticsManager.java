@@ -78,8 +78,6 @@ public abstract class AbstractAnalyticsManager {
   @VisibleForTesting
   final protected String lastErrorMessage;
   @VisibleForTesting
-  final protected String osioSpaceId;
-  @VisibleForTesting
   final protected String sourceTypes;
   @VisibleForTesting
   final protected String startNumber;
@@ -146,7 +144,7 @@ public abstract class AbstractAnalyticsManager {
 
     createdOn = workspace.getAttributes().get(Constants.CREATED_ATTRIBUTE_NAME);
     updatedOn = workspace.getAttributes().get(Constants.UPDATED_ATTRIBUTE_NAME);
-    stoppedOn = workspace.getAttributes().get(  Constants.STOPPED_ATTRIBUTE_NAME);
+    stoppedOn = workspace.getAttributes().get(Constants.STOPPED_ATTRIBUTE_NAME);
     stoppedAbnormally = workspace.getAttributes().get(Constants.STOPPED_ABNORMALLY_ATTRIBUTE_NAME);
     lastErrorMessage = workspace.getAttributes().get(Constants.ERROR_MESSAGE_ATTRIBUTE_NAME);
     sourceTypes = workspace.getAttributes().get("sourceTypes");
@@ -173,7 +171,6 @@ public abstract class AbstractAnalyticsManager {
     stackId = workspace.getAttributes().get("stackName");
     factoryId = workspace.getAttributes().get("factoryId");
     setFactoryVariables(endpoint, workspaceConfig);
-    osioSpaceId = workspace.getAttributes().get("osio_spaceId");
 
     workspaceName = getWorkspaceName(workspaceConfig, devfile);
     userId = getUserIdFromMachineToken(machineToken);
@@ -251,7 +248,6 @@ public abstract class AbstractAnalyticsManager {
         new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner),
         new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILED, stoppedAbnormally),
         new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILURE, lastErrorMessage),
-        new SimpleImmutableEntry<>(EventProperties.OSIO_SPACE_ID, osioSpaceId),
         new SimpleImmutableEntry<>(EventProperties.SOURCE_TYPES, sourceTypes),
         new SimpleImmutableEntry<>(EventProperties.START_NUMBER, startNumber),
         new SimpleImmutableEntry<>(EventProperties.PLUGINS, makePluginString(pluginNames))).forEach((entry) -> {
@@ -420,7 +416,6 @@ public abstract class AbstractAnalyticsManager {
         new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner),
         new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILED, stoppedAbnormally),
         new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILURE, lastErrorMessage),
-        new SimpleImmutableEntry<>(EventProperties.OSIO_SPACE_ID, osioSpaceId),
         new SimpleImmutableEntry<>(EventProperties.SOURCE_TYPES, sourceTypes),
         new SimpleImmutableEntry<>(EventProperties.START_NUMBER, startNumber),
         new SimpleImmutableEntry<>(EventProperties.PLUGINS, makePluginString(pluginNames))).forEach((entry) -> {
