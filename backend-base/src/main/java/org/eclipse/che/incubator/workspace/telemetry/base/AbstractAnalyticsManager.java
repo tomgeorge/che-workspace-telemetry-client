@@ -224,41 +224,6 @@ public abstract class AbstractAnalyticsManager {
     return event;
   }
 
-  /**
-   * Adds common event properties to the properties object
-   *
-   * @param properties
-   * @return
-   */
-  public Map<String, Object> transformProperties(Map<String, Object> properties) {
-    ImmutableMap.Builder<String, Object> commonPropertiesBuilder = ImmutableMap.builder();
-
-    Arrays.asList(new SimpleImmutableEntry<>(EventProperties.CREATED, createdOn),
-        new SimpleImmutableEntry<>(EventProperties.WORKSPACE_ID, workspaceId),
-        new SimpleImmutableEntry<>(EventProperties.WORKSPACE_NAME, workspaceName),
-        new SimpleImmutableEntry<>(EventProperties.UPDATED, updatedOn),
-        new SimpleImmutableEntry<>(EventProperties.STOPPED, stoppedOn),
-        new SimpleImmutableEntry<>(EventProperties.AGE, age),
-        new SimpleImmutableEntry<>(EventProperties.RETURN_DELAY, returnDelay),
-        new SimpleImmutableEntry<>(EventProperties.FIRST_START, firstStart),
-        new SimpleImmutableEntry<>(EventProperties.STACK_ID, stackId),
-        new SimpleImmutableEntry<>(EventProperties.FACTORY_ID, factoryId),
-        new SimpleImmutableEntry<>(EventProperties.FACTORY_NAME, factoryName),
-        new SimpleImmutableEntry<>(EventProperties.FACTORY_URL, factoryUrl),
-        new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner),
-        new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILED, stoppedAbnormally),
-        new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILURE, lastErrorMessage),
-        new SimpleImmutableEntry<>(EventProperties.SOURCE_TYPES, sourceTypes),
-        new SimpleImmutableEntry<>(EventProperties.START_NUMBER, startNumber),
-        new SimpleImmutableEntry<>(EventProperties.PLUGINS, makePluginString(pluginNames))).forEach((entry) -> {
-          if (entry.getValue() != null) {
-            commonPropertiesBuilder.put(entry.getKey(), entry.getValue());
-          }
-
-        });
-    return commonPropertiesBuilder.build();
-  }
-
   public void setCommonProperties(Map<String, Object> commonProperties) {
     this.commonProperties = commonProperties;
   }
