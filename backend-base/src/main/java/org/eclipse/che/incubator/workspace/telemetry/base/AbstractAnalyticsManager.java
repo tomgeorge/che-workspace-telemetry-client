@@ -181,6 +181,12 @@ public abstract class AbstractAnalyticsManager {
       Map<String, Object> properties) {
     if (shouldSendEvent(event, properties)) {
       onEvent(event, ownerId, ip, userAgent, resolution, getCurrentEventProperties(properties));
+      lastEvent = event;
+      lastEventTime = System.currentTimeMillis();
+      lastIp = ip;
+      lastUserAgent = userAgent;
+      lastResolution = resolution;
+      lastEventProperties = properties;
     } else {
       increaseDuration(event, properties);
       return;
