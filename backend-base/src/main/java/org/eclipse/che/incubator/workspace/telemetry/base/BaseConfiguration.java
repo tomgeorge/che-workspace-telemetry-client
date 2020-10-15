@@ -15,7 +15,7 @@ import io.quarkus.arc.DefaultBean;
 @Dependent
 @Default
 public class BaseConfiguration {
-    @ConfigProperty(name = "che.api")
+    @ConfigProperty(name = "che.api.internal")
     protected String apiEndpoint;
 
     @ConfigProperty(name = "che.workspace.id")

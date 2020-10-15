@@ -18,14 +18,14 @@ class AbstractAnalyticsManagerTest {
 
     @BeforeAll
     public static void setUp() {
-        System.setProperty("che.api", "https://fake-che.com/api");
+        System.setProperty("che.api.internal", "https://fake-che.com/api");
         System.setProperty("che.workspace.id", "fake-workspace");
         System.setProperty("che.machine.token", "fake-token");
     }
 
     @AfterAll
     public static void tearDown() {
-        System.clearProperty("che.api");
+        System.clearProperty("che.api.internal");
     }
 
 

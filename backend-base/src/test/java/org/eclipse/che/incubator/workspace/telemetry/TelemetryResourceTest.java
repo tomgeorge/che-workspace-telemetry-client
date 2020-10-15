@@ -21,14 +21,14 @@ public class TelemetryResourceTest {
 
   @BeforeAll
   public static void setUp() {
-    System.setProperty("che.api", "http://fake-che.com/api");
+    System.setProperty("che.api.internal", "http://fake-che.com/api");
     System.setProperty("che.workspace.id", "fake-workspace");
     System.setProperty("che.machine.token", "fake-token");
   }
 
   @AfterAll
   public static void tearDown() {
-    System.clearProperty("che.api");
+    System.clearProperty("che.api.internal");
     System.clearProperty("che.workspace.id");
     System.clearProperty("che.machine.token");
   }
