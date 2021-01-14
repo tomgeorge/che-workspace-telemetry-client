@@ -152,9 +152,10 @@ public abstract class AbstractAnalyticsManager {
 
     pluginNames = getPluginNamesFromWorkspace(workspace);
 
-    Long createDate = getDateFromString(createdOn);
-    Long updateDate = getDateFromString(updatedOn);
-    Long stopDate = getDateFromString(stoppedOn);
+    Long createDate = getDateFromString("created date", createdOn);
+    Long updateDate = getDateFromString("updated date", updatedOn);
+    Long stopDate = getDateFromString("stop date", stoppedOn);
+
 
     age = getSecondsBetween(updateDate, createDate);
     returnDelay = getSecondsBetween(updateDate, stopDate);
@@ -246,12 +247,12 @@ public abstract class AbstractAnalyticsManager {
 
   }
 
-  private Long getDateFromString(String date) {
+  private Long getDateFromString(String fieldName, String date) {
     Long parsedDate = null;
     try {
       parsedDate = parseLong(date);
     } catch (NumberFormatException nfe) {
-      LOG.warn("the timestamp ( " + date + " ) has invalid format", nfe);
+      LOG.warn("the timestamp for " + fieldName + " is null or invalid: [" + date + "]");
     }
     return parsedDate;
   }
