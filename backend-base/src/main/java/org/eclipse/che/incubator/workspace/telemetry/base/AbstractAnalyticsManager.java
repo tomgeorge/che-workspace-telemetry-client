@@ -152,10 +152,21 @@ public abstract class AbstractAnalyticsManager {
 
     pluginNames = getPluginNamesFromWorkspace(workspace);
 
-    Long createDate = getDateFromString("created date", createdOn);
-    Long updateDate = getDateFromString("updated date", updatedOn);
-    Long stopDate = getDateFromString("stop date", stoppedOn);
+    Long createDate = null;
+    Long updateDate = null;
+    Long stopDate = null;
 
+    if (createdOn != null) {
+        createDate = getDateFromString("created date", createdOn);
+    }
+
+    if (updatedOn != null) {
+        updateDate = getDateFromString("updated date", updatedOn);
+    }
+
+    if (stoppedOn != null) {
+        stopDate = getDateFromString("stop date", stoppedOn);
+    }
 
     age = getSecondsBetween(updateDate, createDate);
     returnDelay = getSecondsBetween(updateDate, stopDate);
